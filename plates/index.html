@@ -1,0 +1,414 @@
+<meta charset="utf-8">
+<title>Diagramming Blue: Plates</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+/* Layout: a two-page spread on a table. Verso = the word, its text, its colophon. Recto = the plate, full bleed. */
+/* poem panel: its own blue */
+:root{--poem-bg:#dfe6f4;--poem-ink:#16213a}
+.spread[data-ground="night"]{--poem-bg:#0c1d55;--poem-ink:#e8edf8}
+:root{
+  --table:#d9dde3; --table-ink:#3b4452;
+  --paper:#f2f2ee; --ink:#1c2330; --ink-2:#5b6474; --ink-3:#a5abb6; --rule:#c9ccd2; --edge:rgba(28,35,48,.25); --gutter:rgba(28,35,48,.10);
+  --word:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --text:"EB Garamond","Garamond","Iowan Old Style",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}}
+:root[data-theme="dark"]{--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}
+.spread[data-ground="night"]{--paper:#070b16;--ink:#e4e9f2;--ink-2:#7f8ba3;--ink-3:#3a4560;--rule:#26314a;--edge:rgba(228,233,242,.22);--gutter:rgba(0,0,0,.55)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--table);color:var(--table-ink);font:14px/1.5 var(--text);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 32px;
+  display:flex;flex-direction:column;align-items:center;gap:18px}
+.spread,.turn{width:min(100%,calc((100vh - 150px) * 1.5),1600px)}
+.spread{display:grid;grid-template-columns:1fr 1fr;box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35);background:var(--paper);color:var(--ink)}
+.page{aspect-ratio:3/4;container-type:inline-size;position:relative;min-width:0;overflow:hidden}
+.in{height:100%;display:flex;flex-direction:column}
+.verso{background:linear-gradient(to left,var(--gutter),transparent 7%) var(--paper)}
+.verso .in{padding:7cqi 9cqi 6cqi 11cqi}
+.recto{background:var(--paper)}
+.head{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.word{font:300 clamp(28px,8.6cqi,76px)/1 var(--word);margin:7cqi 0 0 -.05em;letter-spacing:-.05em}
+.word .pre{color:var(--ink-2);margin-right:.25em}
+.word .term{font:400 1.32em/1 var(--text);letter-spacing:-.01em}
+.modes{display:flex;gap:1.6em;margin-top:3.4cqi;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.modes button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink-2);background:none;border:0;border-bottom:1px solid transparent;padding:0 0 .35em;cursor:pointer}
+.modes button[aria-pressed="true"]{color:var(--ink);border-bottom-color:currentColor}
+.poem{margin:3.4cqi 0 0 -2.6cqi;padding:2.6cqi 2.6cqi 2.8cqi 9cqi;list-style:none;background:var(--poem-bg);color:var(--poem-ink);font:400 clamp(12px,2.5cqi,20px)/1.42 var(--text)}
+.poem li{white-space:nowrap}
+.poem .t,.m .t{cursor:default}
+.c{font:400 .66em/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;margin:0 .7em;cursor:default;white-space:nowrap}
+.c i{display:inline-block;width:.75em;height:.75em;margin-right:.45em;vertical-align:-.02em;border:1px solid var(--edge)}
+.poem li.dim{color:color-mix(in srgb,var(--poem-ink) 40%,var(--poem-bg))}
+.mat{margin-top:3.4cqi;flex:1 1 0;min-height:0;overflow:auto;display:grid;gap:.8em;align-content:start;font:400 clamp(11.5px,2.05cqi,16px)/1.35 var(--text);scrollbar-width:thin;scrollbar-color:var(--rule) transparent;padding:0 1em 2em 0;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent)}
+.m{display:grid;grid-template-columns:2em 1fr;align-items:baseline}
+.m .n{font:400 .7em/1 var(--mono);color:var(--ink-2)}
+.bl{display:flex;flex-wrap:wrap;gap:.25em 0;margin-top:.3em}
+.bl .c{margin:0 1.1em 0 0;font-size:.62em}
+.colo{margin-top:auto;padding-top:1em;font:400 clamp(8.5px,1.5cqi,12px)/1.6 var(--mono);color:var(--ink-2);display:grid;gap:.45em}
+.colo p{margin:0;max-width:62ch}
+.colo b{font-weight:500;color:var(--ink)}
+.colo .mh{font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .1em}
+.colo details{border-top:1px solid var(--rule);padding-top:.5em}
+.colo summary{cursor:pointer;list-style:none;color:var(--ink)}
+.colo summary::-webkit-details-marker{display:none}
+.colo summary::before{content:"+";display:inline-block;width:1.2em;color:var(--ink-2)}
+.colo details[open] summary::before{content:"−"}
+.colo details>p,.colo details>div{margin:.4em 0 .2em 1.2em}
+.vlist{display:flex;flex-wrap:wrap;gap:.3em 1.1em}
+.vlist button{border-bottom-color:transparent!important;color:var(--ink-2)!important}
+.vlist button[aria-pressed="true"]{color:var(--ink)!important;border-bottom-color:currentColor!important}
+.colo button{font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--rule);padding:0;cursor:pointer;white-space:nowrap}
+button:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.folio{display:flex;justify-content:space-between;align-items:baseline;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2);margin-top:4cqi}
+/* recto: the plate fills the page; type sits over it */
+.plate{position:absolute;inset:0}
+.plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:none}
+.recto .head,.recto .fo{position:absolute;left:0;right:0;padding-inline:9cqi 7cqi!important;z-index:2;pointer-events:none}
+.recto .head{top:0;padding-top:7cqi;padding-bottom:6cqi;background:linear-gradient(var(--paper) 55%,transparent)}
+.recto .fo{bottom:0;padding-block:5cqi 6cqi;display:flex;justify-content:flex-end;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
+.loupe{position:absolute;z-index:3;width:32cqi;height:32cqi;border-radius:50%;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 10px 30px rgba(0,0,0,.35);background:var(--paper);transform:translate(-50%,-50%)}
+.pxl{position:absolute;z-index:4;transform:translateX(-50%);padding:.55em .9em;background:color-mix(in srgb,var(--paper) 88%,transparent);color:var(--ink);font:500 clamp(9px,1.6cqi,13px)/1 var(--mono);letter-spacing:.04em;white-space:nowrap;pointer-events:none}
+.lensbar{position:absolute;z-index:5;left:7cqi;bottom:4cqi;max-width:64cqi;padding:1.6cqi 2cqi;background:color-mix(in srgb,var(--paper) 88%,transparent);font:500 clamp(8px,1.45cqi,11px)/1.5 var(--mono);color:var(--ink-2);letter-spacing:.06em}
+.lensbar p{margin:.5em 0 0;font-weight:400;letter-spacing:0;max-width:48ch}
+.lenses{display:flex;flex-wrap:wrap;gap:.2em 1.2em;align-items:baseline;text-transform:uppercase;letter-spacing:.14em}
+.lenses button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink-2);background:none;border:0;border-bottom:1px solid transparent;padding:0 0 .3em;cursor:pointer}
+.lenses button[aria-pressed="true"]{color:var(--ink);border-bottom-color:currentColor}
+.pxl i{display:inline-block;width:.9em;height:.9em;vertical-align:-.12em;margin-right:.35em}
+.pxl i.sum{width:1.6em;outline:1px solid var(--edge)}
+.pxl.held{color:var(--ink)}
+.pxl.held i.sum{width:2.6em}
+.pxl em{font-style:normal;color:var(--ink-2);margin:0 .2em}
+.note{position:absolute;z-index:4;max-width:44cqi;display:flex;gap:2cqi;align-items:flex-start;padding:1.6cqi 2cqi;background:color-mix(in srgb,var(--paper) 90%,transparent);font:400 clamp(8.5px,1.5cqi,12px)/1.55 var(--mono);color:var(--ink-2);pointer-events:none}
+.note:empty{display:none}
+.note img{width:9cqi;height:12cqi;object-fit:cover;opacity:.92}
+.note .sw{width:7cqi;height:7cqi;flex:none}
+.note b{display:block;font:400 clamp(11px,2.1cqi,17px)/1.25 var(--text);color:var(--ink);margin-bottom:.25em}
+.turn{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline;font:500 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--table-ink)}
+.turn button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.turn button:disabled{opacity:.35;cursor:default}
+.grounds{flex-basis:100%;display:flex;justify-content:center;gap:16px}
+.grounds .cover{color:inherit;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.grounds .cover:hover,.grounds .cover:focus-visible{border-bottom-color:currentColor;outline:none}
+.grounds span{padding:4px 0;opacity:.5}
+.grounds button[aria-pressed="true"]{border-bottom:1px solid currentColor}
+.idx{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px}
+.idx a{color:inherit;text-decoration:none;opacity:.4}
+.idx a.live{opacity:.85;border-bottom:1px solid transparent}
+.idx a.live:hover{border-bottom-color:currentColor}
+.idx a[aria-current="true"]{opacity:1;border-bottom-color:currentColor}
+.idx sup{font-size:.75em;margin-left:2px}
+@media (max-width:760px){
+  .spread{grid-template-columns:1fr;width:100%}
+  .verso{aspect-ratio:auto}
+  .verso .in{padding:9cqi 8cqi 7cqi}
+  .poem li{white-space:normal}
+  .mat{flex:none;max-height:70vh}
+  .turn{justify-content:center}
+}
+</style>
+
+<div class="spread" id="spread" data-ground="night">
+  <section class="page verso" aria-label="Verso"><div class="in">
+    <div class="head"><span>Diagramming Blue</span><span id="pl-l"></span></div>
+    <h1 class="word" id="word">calm</h1>
+    <div class="modes" role="group" aria-label="Text"><button type="button" data-m="reading" aria-pressed="true">reading</button><button type="button" data-m="materials" aria-pressed="false">materials</button></div>
+    <ol class="poem" id="poem" aria-label="Poem"></ol>
+    <div class="mat" id="mat" hidden></div>
+    <div class="colo">
+      <p class="mh">Method</p>
+      <details><summary>Sources</summary><p id="counts"></p></details>
+      <details id="rule-r"><summary>Reading</summary><p><span id="rule"></span> <button id="again" type="button">Another reading</button></p></details>
+      <details open><summary>Viewing: <b id="vname"></b></summary><div><div class="vlist" id="vlist" role="group" aria-label="Viewings"></div><p id="vrule"></p></div></details>
+      <details><summary>Lens: <b id="lname">none</b></summary><div><div class="vlist" id="lenses" role="group" aria-label="Loupe lens"></div><p id="lens-note"></p></div></details>
+    </div>
+    <div class="folio"><span id="fo-l"></span><span></span></div>
+  </div></section>
+  <section class="page recto" aria-label="Recto">
+    <div class="plate" id="plate"><canvas id="cv" aria-label="Plate: the word's shards, filled with their nearest named blues"></canvas></div>
+    <div class="head"><span id="pl-n"></span><span>Thinking Blue</span></div>
+    <canvas class="loupe" id="loupe" hidden aria-hidden="true"></canvas>
+    <div class="pxl" id="pxl" hidden></div>
+    <div class="note" id="note" aria-live="polite"></div>
+    <div class="fo"><span id="fo-r"></span></div>
+  </section>
+</div>
+<nav class="turn" aria-label="Plates">
+  <button id="prev" type="button">← previous</button>
+  <div class="idx" id="idx"></div>
+  <button id="next" type="button">next →</button>
+  <div class="grounds" role="group" aria-label="Ground"><a class="cover" href="../">← Thinking Blue</a><span aria-hidden="true">·</span><button type="button" data-g="paper" aria-pressed="false">paper</button><button type="button" data-g="night" aria-pressed="true">blue-black</button></div>
+</nav>
+
+<script>
+(()=>{
+const SERIES=[["blue sky",13271],["twilight",15044],["sea",19791],["dream",22832],["sad",25242],["calm",26786],["lonely",27506],["melancholy",33066],["blue eyes",34749],["cold",43824],["blue fabric",48247],["blues",50678],["memory",71581]];
+const LIVE=SERIES.map(x=>x[0]);
+const slug=w=>w.replace(/ /g,"-"),unslug=h=>decodeURIComponent(h).replace(/-/g," ");
+const STOP=new Set("a an the of on in at to and with by over against during about beside near top each other is are its".split(" "));
+const SHORT=[["Ridgway","Ridgway 1912"],["xkcd","xkcd 2010"],["Many Languages","UW survey"],["Traditional colours of China","China, trad."],["ISCC","ISCC–NBS 1955"],["HTML","HTML / CSS"],["Wada","Wada 1930s"],["Traditional colours of Japan","Japan, trad."],["Werner","Werner 1814"],["RAL","RAL"],["Le Corbusier","Le Corbusier"]];
+const short=s=>(SHORT.find(([k])=>s.startsWith(k))||[0,s])[1];
+const $=id=>document.getElementById(id);
+const cv=$("cv"),ctx=cv.getContext("2d",{willReadFrequently:true}),lp=$("loupe"),lctx=lp.getContext("2d");
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+let cur=null,cache={},base=null,lines=null,hit=null,hl=null,seed=1,items=null,mode="reading",K=1;
+
+const rnd=i=>{const x=Math.sin(i*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
+const mul=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const hex2=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const lum=h=>{const [r,g,b]=hex2(h);return .2126*r+.7152*g+.0722*b};
+const esc=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const b64=async r=>{const t=await r.text(),b=atob(t),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer};
+const smooth=k=>{k=Math.min(1,Math.max(0,k));return k*k*(3-2*k)};
+
+async function load(w){
+  if(cache[w])return cache[w];
+  const [meta,fb,pb,ln]=await Promise.all([fetch(slug(w)+".json").then(r=>r.json()),fetch(slug(w)+"-faces.txt").then(b64),fetch(slug(w)+"-photos.txt").then(b64),fetch(slug(w)+"-lines.json").then(r=>r.json())]);
+  const dv=new DataView(fb),faces=[];let o=0;
+  while(o<fb.byteLength){const k=dv.getUint16(o,true),c=dv.getUint16(o+2,true),x=dv.getInt16(o+4,true),y=dv.getInt16(o+6,true),a=dv.getUint16(o+8,true);o+=10;
+    const r=new Int16Array(k*2);let e=1;for(let j=0;j<k*2;j++){r[j]=dv.getInt16(o,true);o+=2;e=Math.max(e,Math.abs(r[j]))}faces.push({c,x,y,a,r,e,n:0})}
+  const pv=new DataView(pb),members=[];o=0;
+  while(o<pb.byteLength){const n=pv.getUint32(o,true);o+=4;const m=new Uint32Array(n);for(let j=0;j<n;j++){m[j]=pv.getUint32(o,true);o+=4;faces[m[j]].n++}members.push(m)}
+  return cache[w]={meta,faces,members,lines:ln};
+}
+
+/* ways of viewing the same shards. Each returns where every shard goes and how large it is. */
+const VIEWS={
+  gathered:{name:"Gathered.",rule:"Every shard in place, filled with its nearest named blue.",
+    make:d=>d.faces.map((f,i)=>({i,f,x:f.x,y:f.y,s:1}))},
+  dissolve:{name:"Dissolve.",rule:"Shards come apart toward the head of the page. Position only.",
+    make:d=>{const H=d.meta.H,out=[];d.faces.forEach((f,i)=>{const k=smooth((f.y/H-.1)/.75);if(rnd(i)<=.35+.65*k)out.push({i,f,x:f.x,y:f.y,s:.18+.82*k})});return out}},
+  agreement:{name:"Crossing.",rule:"Shards hold where many photographs’ lines meet, and fall away where only two or three cut.",
+    make:d=>{const out=[],h=new Map(),N=d.faces.length;d.faces.forEach(f=>h.set(f.n,(h.get(f.n)||0)+1));
+      const cdf=new Map();let acc=0;[...h.keys()].sort((a,b)=>a-b).forEach(n=>{cdf.set(n,(acc+h.get(n)/2)/N);acc+=h.get(n)});
+      d.faces.forEach((f,i)=>{const k=smooth((cdf.get(f.n)-.3)/.5);if(rnd(i)<=.25+.75*k)out.push({i,f,x:f.x,y:f.y,s:.2+.8*k})});return out}},
+  apart:{name:"Apart.",rule:"Each photograph’s cuts in its own cell, in the order the platform returned them.",
+    make:d=>{const W=d.meta.W,H=d.meta.H,cw=W/4,ch=H/4,q=.86/4,out=[];
+      d.members.forEach((m,j)=>{const ox=(j%4)*cw+cw*.07,oy=Math.floor(j/4)*ch+ch*.07;m.forEach(i=>{const f=d.faces[i];out.push({i,f,x:ox+f.x*q,y:oy+f.y*q,s:q,j})})});return out}},
+  census:{name:"Census.",rule:"Shards sorted by the system that named their blue. Who names blue, as columns.",
+    make:d=>{const W=d.meta.W,H=d.meta.H,pal=d.meta.pal,by=new Map();
+      d.faces.forEach((f,i)=>{if(f.c>=pal.length)return;const s=pal[f.c][2];if(!by.has(s))by.set(s,[]);by.get(s).push(i)});
+      const cols=[...by.entries()].sort((a,b)=>b[1].length-a[1].length),k=cols.length,mx=cols[0][1].length;
+      const m=W*.07,colW=(W-2*m)/k,cw=colW*.8,foot=H*.92,Ha=H*.58;
+      const per=Math.max(1,Math.round(cw/Math.sqrt(cw*Ha/mx))),cs=cw/per,out=[],labels=[];
+      cols.forEach(([sys,ids],ci)=>{ids.sort((a,b)=>lum(pal[d.faces[a].c][1])-lum(pal[d.faces[b].c][1]));
+        const x0=m+ci*colW+(colW-cw)/2;
+        ids.forEach((i,t)=>{const f=d.faces[i];out.push({i,f,x:x0+(t%per+.5)*cs,y:foot-(Math.floor(t/per)+.5)*cs,s:cs*.7/f.e})});
+        labels.push({x:x0+cw/2,y:foot-Math.ceil(ids.length/per)*cs-14,a:short(sys),b:ids.length.toLocaleString()})});
+      out.labels=labels;return out}},
+  layered:{name:"Layered.",photo:1,rule:"The fifteen photographs laid over one another at equal weight, before any cut.",
+    make:d=>VIEWS.gathered.make(d)},
+  own:{name:"On their own.",photo:1,rule:"The same fifteen photographs, each in its own cell, in the order the platform returned them.",
+    make:d=>VIEWS.apart.make(d)},
+  words:{name:"Words.",rule:"Each shard replaced by the name of its blue, largest shard first, wherever the name fits.",
+    make:d=>{const W=d.meta.W,H=d.meta.H,pal=d.meta.pal,C=4,gw=Math.ceil(W/C)+1,gh=Math.ceil(H/C)+1,occ=new Uint8Array(gw*gh),mc=document.createElement("canvas").getContext("2d"),out=[];
+      const ord=d.faces.map((f,i)=>i).filter(i=>d.faces[i].c<pal.length).sort((a,b)=>d.faces[b].a-d.faces[a].a);
+      for(const i of ord){const f=d.faces[i],fs=Math.min(60,Math.max(8,Math.sqrt(f.a)*.8)),nm=pal[f.c][0];
+        mc.font=`400 ${fs}px "IBM Plex Mono",monospace`;const w=mc.measureText(nm).width,x0=f.x-w/2,y0=f.y-fs*.55,x1=f.x+w/2,y1=f.y+fs*.55;
+        if(x0<0||y0<0||x1>W||y1>H)continue;const a0=x0/C|0,b0=y0/C|0,a1=x1/C|0,b1=y1/C|0;let ok=true;
+        for(let b=b0;b<=b1&&ok;b++)for(let a=a0;a<=a1;a++)if(occ[b*gw+a]){ok=false;break}
+        if(!ok)continue;for(let b=b0;b<=b1;b++)for(let a=a0;a<=a1;a++)occ[b*gw+a]=1;
+        out.push({i,f,x:f.x,y:f.y,s:1,t:nm,fs,w})}
+      return out}}
+};
+const ORDER=["layered","own","dissolve","agreement","apart","census","words","gathered"];
+let view="dissolve";
+
+function drawItems(g,sc,list,col,rect){
+  for(const it of list){const f=it.f;if(col){const c=col(it);if(!c)continue;g.fillStyle=c}
+    if(it.t){if(rect)g.fillRect((it.x-it.w/2)*sc,(it.y-it.fs*.55)*sc,it.w*sc,it.fs*1.1*sc);
+      else{g.font=`400 ${it.fs*sc}px "IBM Plex Mono",monospace`;g.textAlign="center";g.textBaseline="middle";g.fillText(it.t,it.x*sc,it.y*sc)}continue}
+    const r=f.r,s=it.s;if(r.length<6)continue;g.beginPath();g.moveTo((it.x+r[0]*s)*sc,(it.y+r[1]*s)*sc);
+    for(let j=2;j<r.length;j+=2)g.lineTo((it.x+r[j]*s)*sc,(it.y+r[j+1]*s)*sc);g.closePath();g.fill()}
+}
+const fill=it=>it.f.c<cur.meta.pal.length?cur.meta.pal[it.f.c][1]:null;
+const tok=n=>getComputedStyle($("spread")).getPropertyValue(n).trim();
+
+function size(){const r=cv.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr)}
+/* plates are cover-fitted to the page */
+function fit(){const d=cur.meta,s=Math.max(cv.width/d.W,cv.height/d.H);return{s,ox:(cv.width-d.W*s)/2,oy:(cv.height-d.H*s)/2}}
+function build(){
+  const d=cur.meta;size();const F=fit();
+  K=Math.min(3,3200/cv.width);           // the hi-res source the loupe reads from
+  base=document.createElement("canvas");base.width=Math.round(cv.width*K);base.height=Math.round(cv.height*K);
+  const g=base.getContext("2d");g.translate(F.ox*K,F.oy*K);if(VIEWS[view].photo)drawPhotos(g,F.s*K);else drawItems(g,F.s*K,items,fill);
+  if(items.labels){g.fillStyle=tok("--ink-2");const fs=Math.round(17*F.s*K);
+    items.labels.forEach(l=>{g.save();g.translate(l.x*F.s*K,l.y*F.s*K);g.rotate(-Math.PI/2);g.textBaseline="middle";
+      g.font=`500 ${fs}px "IBM Plex Mono",monospace`;g.fillText(l.a.toUpperCase()+"  ",0,0);const w=g.measureText(l.a.toUpperCase()+"  ").width;
+      g.font=`400 ${fs}px "IBM Plex Mono",monospace`;g.fillText(l.b,w,0);g.restore()})}
+  lines=document.createElement("canvas");lines.width=base.width;lines.height=base.height;
+  if(view!=="census"){const lg=lines.getContext("2d"),q=view==="apart"||view==="own",W=d.W,H=d.H;
+    lg.translate(F.ox*K,F.oy*K);lg.lineWidth=Math.max(1,K*.9);lg.lineJoin="round";const S=F.s*K,ls=+cur.lines.scale||2;
+    for(const p of cur.lines.paths){const xy=p.xy;let ox=0,oy=0,m=1/ls;
+      if(q){ox=(p.k%4)*W/4+W/4*.07;oy=Math.floor(p.k/4)*H/4+H/4*.07;m=.86/4/ls}
+      for(let j=2;j<xy.length;j+=2){const c=p.c[j/2]??p.c[0];lg.strokeStyle=`rgb(${c>>16&255},${c>>8&255},${c&255})`;
+        lg.beginPath();lg.moveTo((ox+xy[j-2]*m)*S,(oy+xy[j-1]*m)*S);lg.lineTo((ox+xy[j]*m)*S,(oy+xy[j+1]*m)*S);lg.stroke()}}}
+  hit=document.createElement("canvas");hit.width=d.W;hit.height=d.H;
+  drawItems(hit.getContext("2d",{willReadFrequently:true}),1,items,it=>{const n=it.i+1;return`rgb(${n>>16&255},${n>>8&255},${n&255})`},true);
+}
+function drawPhotos(g,S){const im=photosImg,d=cur.meta,n=d.photos.length,tw=im.width/4,th=im.height/4;
+  for(let j=0;j<n;j++){const sx=(j%4)*tw,sy=Math.floor(j/4)*th;
+    if(view==="layered"){g.globalAlpha=1/(j+1);g.drawImage(im,sx,sy,tw,th,0,0,d.W*S,d.H*S)}
+    else{const cw=d.W/4,ch=d.H/4,q=.86/4;g.globalAlpha=1;g.drawImage(im,sx,sy,tw,th,((j%4)*cw+cw*.07)*S,(Math.floor(j/4)*ch+ch*.07)*S,d.W*q*S,d.H*q*S)}}
+  g.globalAlpha=1}
+function paint(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(!hl){ctx.drawImage(base,0,0,cv.width,cv.height);return}
+  ctx.globalAlpha=.1;ctx.drawImage(base,0,0,cv.width,cv.height);ctx.globalAlpha=1;
+  const F=fit();ctx.save();ctx.translate(F.ox,F.oy);drawItems(ctx,F.s,items.filter(it=>hl(it)),fill);ctx.restore();
+}
+/* turns are discrete: the plate arrives in eight bands, foot first */
+function reveal(){
+  if(reduce){paint();return}let b=0;
+  const step=()=>{b++;ctx.clearRect(0,0,cv.width,cv.height);const h=cv.height*b/8;
+    ctx.drawImage(base,0,(cv.height-h)*K,base.width,h*K,0,cv.height-h,cv.width,h);if(b<8)setTimeout(step,70)};step();
+}
+
+/* the reading */
+const cspan=c=>{const [n,h]=cur.meta.pal[c];return`<span class="c" data-c="${c}"><i style="background:${h}"></i>${esc(n)}</span>`};
+const words=p=>p.alt.toLowerCase().replace(/[^\p{L}'\s-]/gu," ").split(/\s+/).filter(w=>w&&!STOP.has(w));
+function poem(){
+  const d=cur,R=mul(seed*7919+d.meta.word.length),used=new Set();
+  $("poem").innerHTML=d.meta.photos.map((p,j)=>{const ws=words(p);let a=ws[0]||"",b="";
+    if(ws.length>1){const k=Math.floor(R()*(ws.length-1));a=ws[k];b=ws[k+1]}
+    const c=p.name.find(n=>!used.has(n))??p.name[0];used.add(c);
+    return`<li data-p="${j}" style="padding-left:${Math.floor(R()*3)*1.4}em"><span class="t" data-ps="${j}">${esc(a)}</span>${cspan(c)}<span class="t" data-ps="${j}">${esc(b)}</span></li>`}).join("");
+  $("rule").textContent="One line per photograph: two neighbouring words from its Unsplash description, cut by the blue it holds most relative to the others.";
+  $("again").textContent=`Another reading (${String(seed).padStart(3,"0")})`;
+}
+function materials(){
+  const d=cur,area=new Map();d.faces.forEach(f=>{if(f.c<d.meta.pal.length)area.set(f.c,(area.get(f.c)||0)+f.a)});
+  const all=[...area.keys()].sort((a,b)=>area.get(b)-area.get(a));
+  $("mat").innerHTML=d.meta.photos.map((p,j)=>`<div class="m"><span class="n">${j+1}</span><div>${p.alt.split(/\s+/).map(w=>`<span class="t" data-ps="${j}">${esc(w)}</span>`).join(" ")}<div class="bl">${p.name.slice(0,5).map(cspan).join("")}</div></div></div>`).join("")
+    +`<div class="m"><span class="n">+</span><div>Every blue on the plate, most area first<div class="bl">${all.map(cspan).join("")}</div></div></div>`;
+}
+function setMode(m){mode=m;document.querySelectorAll(".modes button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m));
+  $("poem").hidden=m!=="reading";$("mat").hidden=m!=="materials";$("rule-r").hidden=m!=="reading"}
+document.querySelectorAll(".modes button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+
+/* notes: near the cursor on the plate, top left of the plate for the text */
+const note=$("note");
+function place(x,y){if(true){note.style.left="9cqi";note.style.top="14cqi";return}
+  const R=$("plate").getBoundingClientRect(),w=note.offsetWidth,h=note.offsetHeight,rad=lp.offsetWidth/2;
+  let nx=x+rad+10,ny=y-h/2;
+  if(nx+w>R.width-8){nx=x-rad-10-w;if(nx<8){nx=Math.min(Math.max(8,x-w/2),R.width-8-w);ny=y+rad+44;if(ny+h>R.height-8)ny=y-rad-10-h}}
+  ny=Math.min(Math.max(8,ny),R.height-8-h);
+  note.style.left=Math.max(8,nx)+"px";note.style.top=Math.max(8,ny)+"px"}
+
+function noteColour(c,extra){const [n,h,sys]=cur.meta.pal[c],[r,g,b]=hex2(h);
+  note.innerHTML=`<span class="sw" style="background:${h}"></span><div><b>${esc(n)}</b>${esc(sys)}<br>R ${r} G ${g} B ${b} · ${h.toUpperCase()}${extra?"<br>"+extra:""}</div>`}
+function notePhoto(j){const p=cur.meta.photos[j];
+  note.innerHTML=`<img src="${slug(cur.meta.word)}-p${j}.jpg" alt=""><div><b>${esc(p.alt)}</b>Photograph ${j+1} of ${cur.meta.photos.length} · ${esc(p.by)} / Unsplash<br>${p.n.toLocaleString()} shards</div>`}
+function focus(kind,v){
+  document.querySelectorAll("#poem li").forEach(li=>li.classList.toggle("dim",kind==="p"&&+li.dataset.p!==v));
+  if(kind==="p"){const m=new Uint8Array(cur.faces.length);cur.members[v].forEach(i=>m[i]=1);hl=it=>it.j===undefined?m[it.i]:it.j===v;notePhoto(v)}
+  else if(kind==="c"){hl=it=>it.f.c===v;noteColour(v,"Every shard of this blue")}
+  else{hl=null;note.innerHTML=""}
+  place();paint();
+}
+const verso=document.querySelector(".verso .in");
+verso.addEventListener("pointerover",e=>{const t=e.target.closest("[data-ps],[data-c]");if(!t){if(hl)focus(null);return}
+  t.dataset.c!==undefined?focus("c",+t.dataset.c):focus("p",+t.dataset.ps)});
+verso.addEventListener("pointerleave",()=>focus(null));
+
+/* the loupe, with lenses. Each lens is one stage of the apparatus, seen up close. */
+const pxl=$("pxl"),MAG=3.2,LENSES=["pixels","shards","traces","layers","words"];
+const LENS_NOTE={pixels:"The screen’s own discreteness: each pixel opened into red, green and blue. Hold still and they add up to the colour; move and they come apart.",shards:"The plate magnified.",traces:"The contour lines traced from the photographs, in the colours sampled from them.",layers:"The same spot in all fifteen photographs, in the order the platform returned them.",words:"The name of every shard in view, set in its own blue."};
+let lens=null,photosImg=null,lastXY=null;
+function loadPhotos(){photosImg=null;const im=new Image();im.onload=()=>{if(cur&&im.dataset.w===cur.meta.word)photosImg=im};im.dataset.w=cur.meta.word;im.src=slug(cur.meta.word)+"-photos.jpg"}
+/* where a point on the plate sits in a photograph: only gathered views keep the photographs' geometry */
+function sheetToPhoto(hx,hy){const W=cur.meta.W,H=cur.meta.H;
+  if(view==="census")return null;
+  if(view==="apart"){const cw=W/4,ch=H/4,q=.86/4,j=Math.floor(hx/cw)+4*Math.floor(hy/ch),lx=(hx-(hx>=0?Math.floor(hx/cw):0)*cw-cw*.07)/q,ly=(hy-Math.floor(hy/ch)*ch-ch*.07)/q;
+    return j<cur.meta.photos.length&&lx>=0&&ly>=0&&lx<=W&&ly<=H?{x:lx,y:ly,j,s:q}:null}
+  return{x:hx,y:hy,j:null,s:1}}
+function photoCrop(g,j,cx,cy,r,dx,dy,dw,dh){const im=photosImg;if(!im)return;const tw=im.width/4,th=im.height/4,kx=tw/cur.meta.W,ky=th/cur.meta.H;
+  g.save();g.beginPath();g.rect(dx,dy,dw,dh);g.clip();
+  g.drawImage(im,(j%4)*tw+(cx-r)*kx,Math.floor(j/4)*th+(cy-r*dh/dw)*ky,2*r*kx,2*r*dh/dw*ky,dx,dy,dw,dh);g.restore()}
+/* pixels: apart while you move, adding up to their colour while you hold still */
+let sample=null,still=0,mergeT=0,raf=0;
+function drawPixels(t){const {n,px,L,dpr}=sample,h0=n>>1,cell=L/n,gap=Math.max(1,cell*.08)*(1-t),sw=(cell-gap)/3;
+  lctx.fillStyle="#000";lctx.fillRect(0,0,L,L);
+  px.forEach((rgb,k)=>{const u=k%n,v=(k/n)|0,X=u*cell,Y=v*cell;
+    for(let c=0;c<3;c++){const m=[0,1,2].map(q=>Math.round(q===c?rgb[q]:rgb[q]*t));lctx.fillStyle=`rgb(${m})`;lctx.fillRect(X+c*sw,Y,sw+(c<2?.5:0),cell-gap)}});
+  lctx.strokeStyle="#fff";lctx.lineWidth=Math.max(1.5,dpr*1.2);lctx.globalAlpha=1-t*.7;lctx.strokeRect(h0*cell,h0*cell,cell-gap,cell-gap);lctx.globalAlpha=1}
+function tick(){raf=0;if(lens!=="pixels"||lp.hidden||!sample)return;
+  const e=performance.now()-still,t=reduce?(e>900?1:0):smooth((e-400)/1800);
+  if(t!==mergeT){mergeT=t;drawPixels(t);pxl.classList.toggle("held",t>.98)}
+  if(t<1)raf=requestAnimationFrame(tick)}
+function drawLens(x,y){
+  const R=cv.getBoundingClientRect(),D=lp.offsetWidth,dpr=cv.width/R.width,Wd=Math.round(D*dpr);if(lp.width!==Wd){lp.width=lp.height=Wd}
+  const F=fit(),hx=(x*dpr-F.ox)/F.s,hy=(y*dpr-F.oy)/F.s,reg=D*dpr/MAG/F.s,paper=tok("--paper"),L=lp.width;let label="";
+  lctx.save();lctx.fillStyle=paper;lctx.fillRect(0,0,L,L);
+  if(lens==="pixels"){
+    const n=23,h0=n>>1,px=Math.round(x*dpr)-h0,py=Math.round(y*dpr)-h0,img=ctx.getImageData(px,py,n,n).data,pg=hex2(paper);
+    const px_=[];let mid=[0,0,0];
+    for(let v=0;v<n;v++)for(let u=0;u<n;u++){const o=(v*n+u)*4,a=img[o+3]/255,rgb=[0,1,2].map(k=>Math.round(img[o+k]*a+pg[k]*(1-a)));px_.push(rgb);if(u===h0&&v===h0)mid=rgb}
+    sample={n,px:px_,L,dpr};drawPixels(0);
+    const hx=`#${mid.map(c=>c.toString(16).padStart(2,"0")).join("")}`;label={html:`<i style="background:rgb(${mid[0]},0,0)"></i>R ${mid[0]} <em>+</em> <i style="background:rgb(0,${mid[1]},0)"></i>G ${mid[1]} <em>+</em> <i style="background:rgb(0,0,${mid[2]})"></i>B ${mid[2]} <em>=</em> <i class="sum" style="background:${hx}"></i>${hx}`}}
+  else if(lens==="shards"||lens==="traces"){const src=D*dpr/MAG*K;
+    lctx.drawImage(lens==="shards"?base:lines,x*dpr*K-src/2,y*dpr*K-src/2,src,src,0,0,L,L);
+    label=lens==="shards"?`× ${MAG} · shards`:(view==="census"?"no traces: this view is sorted by name":`× ${MAG} · ${cur.lines.paths.length.toLocaleString()} traced lines on this plate`)}
+  else if(lens==="layers"){const P=sheetToPhoto(hx,hy);
+    if(!P)label="no photographs here: this view is sorted by name";
+    else if(!photosImg)label="loading the photographs…";
+    else{const N=cur.meta.photos.length,g=4,c=L/g,r=reg/P.s/2;
+      for(let j=0;j<N;j++){if(P.j!==null&&P.j!==j){lctx.globalAlpha=.25}photoCrop(lctx,j,P.x,P.y,r*1.6,(j%g)*c+1,Math.floor(j/g)*c+1,c-2,c-2);lctx.globalAlpha=1}
+      label=P.j!==null?`photograph ${P.j+1} of ${N}, among the others`:`this spot in all ${N} photographs`}}
+  else if(lens==="words"){const r=reg/2,seen=[],pal=cur.meta.pal,list=[];
+    for(const it of items){if(Math.abs(it.x-hx)<r&&Math.abs(it.y-hy)<r&&it.f.c<pal.length)list.push(it)}
+    list.sort((a,b)=>b.f.a*b.s*b.s-a.f.a*a.s*a.s);const fs=Math.round(L/17);lctx.textAlign="center";lctx.textBaseline="middle";let k=0;
+    for(const it of list){const X=((it.x-hx)/reg+.5)*L,Y=((it.y-hy)/reg+.5)*L,nm=pal[it.f.c][0];lctx.font=`400 ${fs}px "IBM Plex Mono",monospace`;
+      const w=lctx.measureText(nm).width,box=[X-w/2,Y-fs*.6,X+w/2,Y+fs*.6];if(seen.some(b=>!(box[2]<b[0]||box[0]>b[2]||box[3]<b[1]||box[1]>b[3])))continue;
+      seen.push(box);lctx.fillStyle=pal[it.f.c][1];lctx.fillText(nm,X,Y);if(++k>40)break}
+    label=`${list.length.toLocaleString()} shards in view · ${k} names shown`}
+  lctx.restore();
+  pxl.hidden=false;if(label.html)pxl.innerHTML=label.html;else pxl.textContent=label;pxl.style.left=x+"px";pxl.style.top=(y+D/2+8)+"px";
+  return{hx,hy}}
+cv.addEventListener("pointermove",e=>{if(hl)return;const R=cv.getBoundingClientRect(),x=e.clientX-R.left,y=e.clientY-R.top;lastXY=[x,y];
+  lp.hidden=!lens;lp.style.left=x+"px";lp.style.top=y+"px";const {hx,hy}=drawLens(x,y);if(!lens)pxl.hidden=true;
+  still=performance.now();mergeT=0;pxl.classList.remove("held");if(lens==="pixels"&&!raf)raf=requestAnimationFrame(tick);
+  const p=hit.getContext("2d").getImageData(Math.floor(hx),Math.floor(hy),1,1).data,i=(p[0]<<16|p[1]<<8|p[2])-1,f=cur.faces[i];
+  if(!f||p[3]<250)note.innerHTML="";
+  else if(f.c>=cur.meta.pal.length)note.innerHTML=`<div><b>Unnamed</b>No blue in the eleven systems was near enough</div>`;
+  else noteColour(f.c,"Shard "+(i+1).toLocaleString()+" · edges from "+f.n+" of "+cur.meta.photos.length+" photographs");
+  place(x,y)});
+cv.addEventListener("pointerleave",()=>{lp.hidden=true;pxl.hidden=true;lastXY=null;if(!hl)note.innerHTML=""});
+function setLens(l){lens=l;still=performance.now();mergeT=0;if(l==="pixels"&&!raf)raf=requestAnimationFrame(tick);document.querySelectorAll("#lenses button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l));$("lname").textContent=l||"none";$("lens-note").textContent=l?LENS_NOTE[l]+" Roll over the plate to look; click the lens again to put it away.":"Choose a lens, then roll over the plate.";cv.style.cursor=l?"none":"crosshair";if(!l){lp.hidden=true;pxl.hidden=true}else if(lastXY){lp.hidden=false;drawLens(...lastXY)}}
+$("lenses").innerHTML=LENSES.map(l=>`<button type="button" data-l="${l}" aria-pressed="false">${l}</button>`).join("");
+$("lenses").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setLens(lens===b.dataset.l?null:b.dataset.l)});setLens(null);
+
+
+function setView(v,turn){view=v;const V=VIEWS[v];if(V.photo&&!photosImg){const w=cur.meta.word,im=new Image();im.onload=()=>{if(cur.meta.word!==w||view!==v)return;photosImg=im;setView(v,turn)};im.src=slug(w)+"-photos.jpg";$("vname").textContent=V.name.replace(/\.$/,"");$("vrule").textContent="Loading the photographs…";return}items=V.make(cur);
+  $("vname").textContent=V.name.replace(/\.$/,"");document.querySelectorAll("#vlist button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));$("vrule").textContent=V.rule;build();turn?reveal():paint()}
+async function open(w,turn){
+  const d=await load(w);cur=d;hl=null;
+  const pn=SERIES.findIndex(s=>s[0]===w)+1,N=d.meta.photos.length;
+  $("word").innerHTML=`<span class="pre">blue:</span><span class="term">${esc(w)}</span>`;$("pl-l").textContent="Plate "+pn;$("pl-n").textContent="Plate "+pn;
+  $("counts").textContent=`${N} photographs · ${d.meta.faces.toLocaleString()} shards · ${d.meta.named} named blues, from 675 names in eleven systems. ${d.meta.src}, ${d.meta.date}. Each forced to 900 × 1200, blurred 18 px, cut into 8 lightness bands.${d.meta.later?" Traced with a later contour routine that draws slightly denser lines; compare with the October 12–13 plates with care.":""}`;
+  $("fo-l").textContent=String(pn*2);$("fo-r").textContent=String(pn*2+1);
+  document.querySelectorAll(".idx a").forEach(a=>a.setAttribute("aria-current",a.dataset.w===w));
+  const li=LIVE.indexOf(w);$("prev").disabled=li<=0;$("next").disabled=li>=LIVE.length-1;
+  poem();materials();setMode(mode);loadPhotos();setLens(lens);note.innerHTML="";setView(view,turn);
+  try{history.replaceState(null,"","#"+slug(w))}catch(e){}
+}
+$("idx").innerHTML=SERIES.map(([w],k)=>`<a href="#${slug(w)}" class="live" data-w="${w}">${w}<sup>${k+1}</sup></a>`).join("");
+$("idx").addEventListener("click",e=>{const a=e.target.closest("a.live");if(!a)return;e.preventDefault();open(a.dataset.w,1)});
+$("prev").onclick=()=>open(LIVE[LIVE.indexOf(cur.meta.word)-1],1);
+$("next").onclick=()=>open(LIVE[LIVE.indexOf(cur.meta.word)+1],1);
+$("again").onclick=()=>{seed++;poem()};
+$("vlist").innerHTML=ORDER.map(k=>`<button type="button" data-v="${k}">${VIEWS[k].name.replace(/\.$/,"")}</button>`).join("");
+$("vlist").querySelectorAll("button").forEach(b=>{b.onclick=()=>setView(b.dataset.v,1);b.setAttribute("aria-pressed",b.dataset.v===view)});
+document.querySelectorAll(".grounds button").forEach(b=>b.onclick=()=>{$("spread").dataset.ground=b.dataset.g;
+  document.querySelectorAll(".grounds button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(view==="census"){build();paint()}});
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(cur){build();paint()}},150)});
+const h=location.hash.slice(1);
+(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>open(LIVE.includes(unslug(h))?unslug(h):"blue sky",1));
+})();
+</script>

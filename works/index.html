@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Works in Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Same two-page spread as Plates and Names. Verso = facts and 100% details. Recto = the drawing, whole, with deep zoom. */
+:root{
+  --table:#d9dde3; --table-ink:#3b4452;
+  --paper:#f2f2ee; --ink:#1c2330; --ink-2:#5b6474; --ink-3:#a5abb6; --rule:#c9ccd2; --edge:rgba(28,35,48,.25); --gutter:rgba(28,35,48,.10);
+  --text:"EB Garamond","Garamond","Iowan Old Style",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}}
+:root[data-theme="dark"]{--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}
+.spread[data-ground="night"]{--paper:#070b16;--ink:#e4e9f2;--ink-2:#7f8ba3;--ink-3:#3a4560;--rule:#26314a;--edge:rgba(228,233,242,.22);--gutter:rgba(0,0,0,.55)}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--table);color:var(--table-ink);font:14px/1.5 var(--text);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 32px;
+  display:flex;flex-direction:column;align-items:center;gap:18px}
+.spread,.turn{width:min(100%,calc((100vh - 150px) * 1.5),1600px)}
+.spread{display:grid;grid-template-columns:1fr 1fr;box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35);background:var(--paper);color:var(--ink)}
+.page{aspect-ratio:3/4;container-type:inline-size;position:relative;min-width:0;overflow:hidden}
+.in{height:100%;display:flex;flex-direction:column}
+.verso{background:linear-gradient(to left,var(--gutter),transparent 7%) var(--paper)}
+.verso .in{padding:7cqi 9cqi 6cqi 11cqi}
+.recto{background:var(--paper)}
+.head{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.word{font:300 clamp(26px,7.4cqi,66px)/1.02 var(--mono);margin:7cqi 0 0 -.05em;letter-spacing:-.05em;text-wrap:balance}
+.word .pre{color:var(--ink-2);margin-right:.25em}
+.word .term{font:400 1.3em/1 var(--text);letter-spacing:-.01em}
+.facts{margin:4cqi 0 0;display:grid;grid-template-columns:auto 1fr;gap:.5em 1.6em;font:400 clamp(11px,2cqi,16px)/1.35 var(--text)}
+.facts dt{font:500 clamp(8px,1.4cqi,11px)/1.9 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.facts dd{margin:0}
+.facts dd i{font-style:italic}
+.facts .tbd{color:var(--ink-3)}
+.dets{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:2cqi}
+.dets button{all:unset;cursor:pointer;display:block;position:relative}
+.dets img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;outline:1px solid var(--edge)}
+.dets button:hover img,.dets button:focus-visible img{outline:1px solid var(--ink)}
+.dets span{display:block;margin-top:.6em;font:400 clamp(8px,1.35cqi,11px)/1.3 var(--mono);color:var(--ink-2)}
+.dets button[aria-pressed="true"] span{color:var(--ink)}
+.cap{margin:1.2em 0 0;font:400 clamp(8.5px,1.45cqi,12px)/1.6 var(--mono);color:var(--ink-2)}
+.folio{display:flex;justify-content:space-between;align-items:baseline;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2);margin-top:4cqi}
+/* recto: the drawing */
+.view{position:absolute;inset:13cqi 7cqi 11cqi 7cqi;overflow:hidden}
+.view img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .45s}
+.view img.off{opacity:0}
+.recto .head,.recto .fo{position:absolute;left:0;right:0;padding-inline:9cqi 7cqi;z-index:2;pointer-events:none}
+.recto .head{top:0;padding-top:7cqi}
+.recto .fo{bottom:0;padding-block:0 6cqi;display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
+.turn{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline;font:500 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--table-ink)}
+.turn button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.turn button:disabled{opacity:.35;cursor:default}
+.grounds{flex-basis:100%;display:flex;justify-content:center;gap:16px}
+.grounds .cover{color:inherit;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.grounds .cover:hover,.grounds .cover:focus-visible{border-bottom-color:currentColor;outline:none}
+.grounds span{padding:4px 0;opacity:.5}
+.grounds button[aria-pressed="true"],.idx button[aria-current="true"]{border-bottom:1px solid currentColor}
+.idx{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 14px}
+button:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+@media (max-width:760px){
+  .spread{grid-template-columns:1fr;width:100%}
+  .verso{aspect-ratio:auto}
+  .verso .in{padding:9cqi 8cqi 7cqi}
+  .dets{margin-top:6cqi}
+  .turn{justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="spread" id="spread" data-ground="night">
+  <section class="page verso" aria-label="Verso"><div class="in">
+    <div class="head"><span>Works in progress</span><span id="pg-l"></span></div>
+    <h1 class="word" id="word"></h1>
+    <dl class="facts" id="facts"></dl>
+    <div class="dets" id="dets"></div>
+    <p class="cap">Details at 100%. Click one to set it on the facing page.</p>
+    <div class="folio"><span id="fo-l"></span><span></span></div>
+  </div></section>
+  <section class="page recto" aria-label="Recto">
+    <div class="head"><span id="pg-r"></span><span>Thinking Blue</span></div>
+    <div class="view" id="view"><img id="close" alt=""><img id="det" class="off" alt=""></div>
+    <div class="fo"><span id="zoom"></span><span id="fo-r"></span></div>
+  </section>
+</div>
+<nav class="turn" aria-label="Spreads">
+  <button id="prev" type="button">← previous</button>
+  <div class="idx" id="idx"></div>
+  <button id="next" type="button">next →</button>
+  <div class="grounds" role="group" aria-label="Ground"><a class="cover" href="../">← Thinking Blue</a><span aria-hidden="true">·</span><button type="button" data-g="paper" aria-pressed="false">paper</button><button type="button" data-g="night" aria-pressed="true">blue-black</button></div>
+</nav>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+/* Facts only. Anything not known is left for Roy to fill. */
+const H=[
+ {k:"h1",fit:"contain",on:"a line plate",w:2878,h:4032,d:[[.5,.195],[.3,.42],[.785,.58]],
+  facts:[["Date","24 October 2026"],["Drawn on","a printed line plate from <i>Diagramming Blue</i>"],["Also","handwritten text across the top"],["Medium","powder pastel, pen and ink, markers, pencil crayons, printed image"],["Source","scan, 2878 × 4032"]]},
+ {k:"h2",fit:"contain",on:"<i>How many blues are there?</i>",w:3521,h:5258,d:[[.5,.42],[.824,.5],[.25,.83]],
+  facts:[["Date","7 November 2026"],["Drawn on","the print <i>How many blues are there?</i>"],["Medium","powder pastel, pen and ink, markers, pencil crayons, printed image"],["Source","phone photograph, straightened, 3521 × 5258"]]},
+ {k:"h3",on:"a line plate, in watercolour",w:3821,h:5596,d:[[.5,.5],[.56,.859],[.82,.141]],
+  facts:[["Date","7 November 2026"],["Drawn on","a printed line plate from <i>Diagramming Blue</i>"],["Medium","powder pastel, pen and ink, markers, pencil crayons, printed image"],["Source","phone photograph, straightened, 3821 × 5596"]]}
+];
+const close=$("close"),det=$("det");let cur=0,open=-1;
+function setDet(j){open=j;const d=H[cur];
+  $("dets").querySelectorAll("button").forEach((x,i)=>x.setAttribute("aria-pressed",i===j));
+  if(j<0){det.classList.add("off");$("zoom").textContent="close-up";return}
+  det.src=`${d.k}-d${j+1}.jpg`;det.alt=`Detail ${j+1} at 100%`;det.classList.remove("off");$("zoom").textContent=`detail ${String(j+1).padStart(2,"0")} · 100% · click to return`}
+det.onclick=()=>setDet(-1);
+function show(i){
+  cur=(i+H.length)%H.length;const d=H[cur];
+  $("word").innerHTML=`<span class="pre">blue:</span><span class="term">on ${d.on}</span>`;
+  $("facts").innerHTML=d.facts.map(([t,v])=>`<dt>${t}</dt><dd${v?"":" class=tbd"}>${v||"to add"}</dd>`).join("");
+  $("dets").innerHTML=d.d.map(([u,v],j)=>`<button type="button" data-j="${j}" aria-pressed="false"><img src="${d.k}-d${j+1}.jpg" alt="Detail ${j+1} at 100%"><span>${String(j+1).padStart(2,"0")} · ${Math.round(u*100)}, ${Math.round(v*100)}</span></button>`).join("");
+  $("dets").querySelectorAll("button").forEach(b=>b.onclick=()=>setDet(open===+b.dataset.j?-1:+b.dataset.j));
+  const n=String(cur*2+1).padStart(2,"0"),m=String(cur*2+2).padStart(2,"0");
+  $("pg-l").textContent=`${cur+1} / ${H.length}`;$("fo-l").textContent=n;$("fo-r").textContent=m;$("pg-r").textContent="Hand";
+  close.src=d.k+"-close.jpg";close.style.objectFit=d.fit||"cover";close.alt=`Close-up of the drawing on ${d.on.replace(/<[^>]+>/g,"")}`;
+  $("prev").disabled=false;$("next").disabled=false;
+  $("idx").querySelectorAll("button").forEach((b,j)=>b.setAttribute("aria-current",j===cur));
+  setDet(-1);
+}
+$("idx").innerHTML=H.map((d,j)=>`<button type="button">${String(j+1).padStart(2,"0")}</button>`).join("");
+$("idx").querySelectorAll("button").forEach((b,j)=>b.onclick=()=>show(j));
+$("prev").onclick=()=>show(cur-1);$("next").onclick=()=>show(cur+1);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")setDet(-1);if(e.key==="ArrowRight")show(cur+1);if(e.key==="ArrowLeft")show(cur-1)});
+document.querySelectorAll(".grounds button").forEach(b=>b.onclick=()=>{$("spread").dataset.ground=b.dataset.g;document.querySelectorAll(".grounds button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+show(0);
+})();
+</script>
+</body>
+</html>

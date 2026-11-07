@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thinking Blue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* The opening spread. Verso = the project text, Roy's words verbatim. Recto = the four books, read backwards from the hand to the plates. */
+:root{
+  --table:#d9dde3; --table-ink:#3b4452;
+  --paper:#f2f2ee; --ink:#1c2330; --ink-2:#5b6474; --ink-3:#a5abb6; --rule:#c9ccd2; --edge:rgba(28,35,48,.25); --gutter:rgba(28,35,48,.10);
+  --text:"EB Garamond","Garamond","Iowan Old Style",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}}
+:root[data-theme="dark"]{--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}
+.spread[data-ground="night"]{--paper:#070b16;--ink:#e4e9f2;--ink-2:#7f8ba3;--ink-3:#3a4560;--rule:#26314a;--edge:rgba(228,233,242,.22);--gutter:rgba(0,0,0,.55)}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--table);color:var(--table-ink);font:14px/1.5 var(--text);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 32px;
+  display:flex;flex-direction:column;align-items:center;gap:18px}
+.spread,.turn{width:min(100%,calc((100vh - 110px) * 1.5),1600px)}
+.spread{display:grid;grid-template-columns:1fr 1fr;box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35);background:var(--paper);color:var(--ink)}
+.page{aspect-ratio:3/4;container-type:inline-size;position:relative;min-width:0;overflow:hidden}
+.in{height:100%;display:flex;flex-direction:column}
+.verso{background:linear-gradient(to left,var(--gutter),transparent 7%) var(--paper)}
+.verso .in{padding:7cqi 9cqi 6cqi 11cqi}
+.recto .in{padding:7cqi 7cqi 6cqi 9cqi}
+.head{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.word{font:300 clamp(28px,8.6cqi,76px)/1 var(--mono);margin:7cqi 0 0 -.05em;letter-spacing:-.05em}
+.word .pre{color:var(--ink-2);margin-right:.25em}
+.word .term{font:400 1.32em/1 var(--text);letter-spacing:-.01em}
+.sub{margin:2.4cqi 0 0;font:400 clamp(9px,1.7cqi,13px)/1.5 var(--mono);color:var(--ink-2);letter-spacing:.02em}
+.text{margin-top:4.5cqi;flex:1 1 0;min-height:0;overflow:auto;padding-right:1em;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.text p{margin:0 0 .9em;font:400 clamp(12px,2.25cqi,18px)/1.45 var(--text);max-width:34em;hyphens:auto}
+.folio{display:flex;justify-content:space-between;align-items:baseline;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2);margin-top:3cqi}
+.books{margin-top:7cqi;flex:1 1 0;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4.5cqi 4cqi}
+.book{display:flex;flex-direction:column;min-height:0;color:inherit;text-decoration:none}
+.book .im{flex:1 1 0;min-height:0;position:relative;overflow:hidden;outline:1px solid var(--edge)}
+.book img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+.book:hover img,.book:focus-visible img{transform:scale(1.035)}
+.book:hover .im,.book:focus-visible .im{outline-color:var(--ink)}
+.book:focus-visible{outline:none}
+.book .n{margin-top:1.6cqi;display:flex;justify-content:space-between;align-items:baseline;font:500 clamp(8px,1.4cqi,11px)/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.book .t{margin-top:.5cqi;font:400 clamp(13px,2.5cqi,20px)/1.15 var(--text);color:var(--ink)}
+.book .f{margin-top:.4cqi;font:400 clamp(8px,1.35cqi,11px)/1.35 var(--mono);color:var(--ink-2)}
+.turn{display:flex;justify-content:center;gap:16px;font:500 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--table-ink)}
+.turn button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.turn button[aria-pressed="true"]{border-bottom:1px solid currentColor}
+button:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+@media (max-width:760px){
+  .spread{grid-template-columns:1fr;width:100%}
+  .page{aspect-ratio:auto}
+  .verso .in,.recto .in{padding:9cqi 8cqi 7cqi}
+  .text{flex:none;overflow:visible}
+  .books{flex:none;grid-template-rows:auto auto}
+  .book .im{flex:none;aspect-ratio:1}
+}
+</style>
+</head>
+<body>
+<div class="spread" id="spread" data-ground="night">
+  <section class="page verso" aria-label="Verso"><div class="in">
+    <div class="head"><span>Rachel Horst</span><span>2026, ongoing</span></div>
+    <h1 class="word"><span class="pre">blue:</span><span class="term">thinking</span></h1>
+    <p class="sub">Thinking Blue: Discreteness, Atmosphere, and Digital Mediation</p>
+    <div class="text">
+      <p>This inquiry begins in thinking blue and seeks to find blue resonances across atmosphere, language, memory, and digital mediations. Blue appears in sky and water as gradients of light and depth—continuous phenomena produced through atmospheric scattering and relational perception. The inquiry thinks planetary blue together with digital and posthuman theory, tracing how blue becomes abstracted, permuted, and discretized as it moves and becomes digital. This project seeks to follow the continuous phenomena of blue and identify multimodal flight patterns across different registers: planetary blue; languaged blue; #0000ff; memory blue, blue stored in dreams and digital architectures, invisible blue, and sounded blue.</p>
+      <p>Thinking blue is both method and matter. Through fictopoeisis, a form of speculative theory writing, and arts-based digital inquiry, this project explores how the discreteness of blues moves across perception, language, and digital mediation shaping how skies and blue guitars might come to be.</p>
+    </div>
+    <div class="folio"><span>i</span><span></span></div>
+  </div></section>
+  <section class="page recto" aria-label="Recto"><div class="in">
+    <div class="head"><span>Four books</span><span>Thinking Blue</span></div>
+    <nav class="books" aria-label="The four books">
+      <a class="book" href="works/">
+        <div class="im"><img src="t4.jpg" alt="Watercolour and pen drawn into a printed line plate"></div>
+        <div class="n"><span>4</span><span>open →</span></div><div class="t">Works in progress</div><div class="f">three drawings on the machine’s plates</div></a>
+      <a class="book" href="gathering/">
+        <div class="im"><img src="t3.jpg" alt="Blue sky shards stacked in three dimensions"></div>
+        <div class="n"><span>3</span><span>open →</span></div><div class="t">Gathering</div><div class="f">the plates in 3D, with a studio</div></a>
+      <a class="book" href="names/">
+        <div class="im"><img src="t2.jpg" alt="Orbit chart of named blues around #0000ff"></div>
+        <div class="n"><span>2</span><span>open →</span></div><div class="t">Names</div><div class="f">675 names, 11 naming systems</div></a>
+      <a class="book" href="plates/">
+        <div class="im"><img src="t1.jpg" alt="Shard plate for the word memory"></div>
+        <div class="n"><span>1</span><span>open →</span></div><div class="t">Plates</div><div class="f">13 words, one plate each</div></a>
+    </nav>
+    <div class="folio"><span></span><span>ii</span></div>
+  </div></section>
+</div>
+<nav class="turn" aria-label="Ground"><button type="button" data-g="paper" aria-pressed="false">paper</button><button type="button" data-g="night" aria-pressed="true">blue-black</button></nav>
+<script>
+document.querySelectorAll(".turn button").forEach(b=>b.onclick=()=>{document.getElementById("spread").dataset.ground=b.dataset.g;document.querySelectorAll(".turn button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+</script>
+</body>
+</html>

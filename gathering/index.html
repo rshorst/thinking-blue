@@ -1,0 +1,840 @@
+<meta charset="utf-8">
+<title>Thinking Blue: Gathering</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+/* a dark room, on purpose: the sculpture is lit from inside its own blues */
+:root{--room:#05080f;--ink:#e9eef7;--dim:#8d9ab0;--rule:rgba(233,238,247,.14);--panel:rgba(10,16,30,.78);--accent:#9fc4ff;
+  --display:"EB Garamond","Garamond",Georgia,serif;--sans:"IBM Plex Mono",ui-monospace,Menlo,monospace;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--room);color:var(--ink);font:14px/1.5 var(--sans);overflow:hidden}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#gl.drag{cursor:grabbing}
+.top{position:fixed;top:0;left:0;right:0;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;justify-content:space-between;pointer-events:none}
+.top>*{pointer-events:auto}
+/* focus: only the artwork */
+body.focus .top,body.focus .cap,body.focus .stages,body.focus #bl,body.focus #blp,body.focus #gifp,body.focus #lightp,body.focus #dg,body.focus #tip,body.focus #diag{display:none!important}
+#unfocus{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));opacity:.18;font:500 10.5px/1 var(--mono);padding:7px 10px;transition:opacity .3s;z-index:30}
+#unfocus:hover,#unfocus:focus-visible{opacity:1}
+.words{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;max-width:min(520px,calc(100vw - 32px));pointer-events:auto}
+.words a{font:500 10.5px/1.6 var(--mono);color:var(--dim);text-decoration:none;letter-spacing:.04em}
+.words a:hover{color:var(--ink)}.words a[aria-current="page"]{color:var(--ink);border-bottom:1px solid var(--ink)}
+h1{font:400 clamp(26px,3.4vw,40px)/1 var(--display);margin:0;letter-spacing:-.01em}
+h1 i{font-style:italic}
+.eyebrow{font:500 10.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button,.btn{font:500 12px/1 var(--sans);color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:rgba(233,238,247,.4)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--room);border-color:var(--ink)}
+.cap{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:min(440px,calc(100% - 32px));font:400 13px/1.55 var(--sans);color:#fff;text-shadow:0 1px 8px rgba(3,8,20,.7);pointer-events:none}
+.cap b{display:block;font:italic 400 22px/1.15 var(--display);color:var(--ink);margin-bottom:4px}
+.lab{position:fixed;left:0;top:0;pointer-events:none;font:500 10.5px/1.3 var(--mono);color:var(--ink);white-space:nowrap;transform:translate(-50%,-50%);text-shadow:0 0 6px var(--room),0 0 2px var(--room);transition:opacity .4s}
+.nm{position:fixed;left:0;top:0;pointer-events:none;transform:translate(-50%,-50%);font:italic 400 22px/1.05 var(--display);white-space:nowrap;text-shadow:0 0 14px rgba(160,190,255,.35),0 0 2px rgba(255,255,255,.35);opacity:0;transition:opacity .9s;z-index:0}
+.nm.on{opacity:1}
+.nm small{display:block;font:500 9px/1.4 var(--mono);letter-spacing:.06em;color:var(--dim);font-style:normal;text-shadow:none}
+.lab small{display:block;color:var(--dim);font-size:9.5px}
+/* hovering a shard: its name set as a poem, on a ground of that blue */
+#tip{position:fixed;pointer-events:none;z-index:5;width:max-content;min-width:150px;max-width:250px;padding:20px 22px 15px;border-radius:2px;background:var(--b,#fff);color:var(--on,#0b1530);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+#tip .poem{font:italic 400 32px/1.04 var(--display);margin:0 0 16px}
+#tip .poem span{display:block}
+#tip .meta{font:500 10.5px/1.65 var(--mono);padding-top:9px;border-top:1px solid currentColor;opacity:.85}
+/* diagrams entered into the space */
+#dg{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(300px,calc(100% - 32px));max-height:min(70vh,560px);overflow:auto;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#dg h2{font:italic 400 19px/1.2 var(--display);margin:0 0 4px}
+#dg p{margin:0 0 10px;color:var(--dim);font-size:12.5px}
+#dg .item{border-top:1px solid var(--rule);padding:10px 0 4px;display:grid;gap:6px}
+#dg .item header{display:flex;align-items:center;gap:8px;justify-content:space-between}
+#dg .item img{width:44px;height:44px;object-fit:contain;background:#0b1220;border-radius:3px}
+#dg label{display:grid;grid-template-columns:52px 1fr;align-items:center;gap:8px;font:500 10.5px/1 var(--mono);color:var(--dim)}
+#dg input[type=range]{width:100%;accent-color:var(--accent)}
+#dg .row{display:flex;gap:6px;flex-wrap:wrap}
+#dg button{padding:6px 10px;font-size:11.5px}
+#dg .sel{outline:1px solid var(--accent);outline-offset:4px;border-radius:2px}
+.load{position:fixed;inset:0;display:grid;place-items:center;color:var(--dim);font:500 12px var(--mono);letter-spacing:.1em}
+@media (max-width:640px){#dg{max-height:42vh}.cap{bottom:auto;top:calc(150px + env(safe-area-inset-top,0px))}}
+.stages{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:4px;align-items:center;background:var(--panel);border:1px solid var(--rule);border-radius:999px;padding:4px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.stages button{border:0}
+.stages{max-width:calc(100% - 32px);flex-wrap:wrap;justify-content:center;border-radius:22px}
+#lightp .gl,#gifp .gl{display:grid;grid-template-columns:60px 1fr;align-items:center;gap:8px;font:500 10.5px var(--mono);color:var(--dim);margin:6px 0}
+#gifp select{font:500 11px var(--mono);color:var(--ink);background:#0b1220;border:1px solid var(--rule);border-radius:6px;padding:5px}
+#lightp input[type=range]{width:100%;accent-color:var(--accent)}
+#lightp .gl{grid-template-columns:78px 1fr}
+#lightp,#gifp{left:auto;right:max(16px,env(safe-area-inset-right,0px))}
+#bl,#blp,#gifp,#lightp{position:fixed;left:max(16px,env(safe-area-inset-left,0px));width:min(290px,calc(100% - 32px));max-height:min(60vh,520px);overflow:auto;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:6}
+#lightp h2,#gifp h2,#blp h2,#bl h2{font:italic 400 19px/1.2 var(--display);margin:0 0 4px}#lightp p,#gifp p,#blp p,#bl p{margin:0 0 10px;color:var(--dim);font-size:12.5px}
+#lightp .row,#gifp .row,#blp .row,#bl .row{display:flex;gap:6px;margin-bottom:8px}#lightp .row button,#gifp .row button,#blp .row button,#bl .row button{padding:5px 10px;font-size:11.5px}
+#blp label,#bl label{display:grid;grid-template-columns:16px 22px 1fr auto;gap:8px;align-items:center;padding:4px 0;font-size:12.5px;cursor:pointer}
+#blp label .sw,#bl label .sw{width:14px;height:14px;border-radius:2px}#bl label img{width:22px;height:28px;object-fit:cover;border-radius:2px}#bl label .n{font:500 10px var(--mono);color:var(--dim)}
+#blp input,#bl input{accent-color:var(--accent);margin:0}
+.stages .sel{font:500 11px/1 var(--mono);color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:6px 8px;max-width:150px}
+.stages .sel option{background:#0b1220;color:var(--ink)}
+.stages{width:min(980px,calc(100% - 32px));max-width:none;gap:6px 8px;padding:6px 8px}
+.stages .cl{display:inline-flex;align-items:center;gap:2px;flex-wrap:nowrap;white-space:nowrap;padding:2px;border-radius:999px;background:rgba(255,255,255,.035)}
+.stages .cl+.cl,.stages .grp+.cl{margin-left:2px}
+.stages button{transition:background .15s,color .15s}
+.stages button:hover{background:rgba(255,255,255,.08)}
+.stages button[aria-pressed="true"]{background:var(--ink);color:var(--room)}
+.stages button:active{transform:scale(.96)}
+.grp{display:contents}.grp[hidden]{display:none!important}
+.modes .eye{font:500 10px/1 var(--mono);padding:6px 8px;margin-right:4px;color:var(--dim)}.modes .eye[aria-pressed="true"]{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.modes{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:2px}.modes button{padding:6px 12px}
+.swatches{display:inline-flex;gap:3px;flex-wrap:wrap;max-width:260px}.swatches button{width:18px;height:18px;border-radius:50%;padding:0;border:1px solid rgba(255,255,255,.25)}
+.swatches button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.stages .sm{font:500 11px/1 var(--mono);letter-spacing:.04em;padding:8px 9px}
+.stages .lbl{font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:0 2px 0 6px}
+.stages .sep{width:1px;height:18px;background:var(--rule);margin:0 4px}
+.cap{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+#dg{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+@media (max-width:640px){.stages{left:16px;right:16px;transform:none;flex-wrap:wrap;border-radius:12px;justify-content:center}}
+/* Thinking Blue: Gathering, set as the same two-page spread as Names and Plates. Verso = the word and the step; recto = the sculpture */
+:root{--table:#d9dde3;--table-ink:#3b4452;--paper:#f2f2ee;--pink:#1c2330;--pink2:#5b6474;--prule:#c9ccd2;--pedge:rgba(28,35,48,.25);--gutter:rgba(28,35,48,.10);--text:"EB Garamond","Garamond",Georgia,serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}}
+:root[data-theme="dark"]{--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}
+.spread[data-ground="night"]{--paper:#070b16;--pink:#e4e9f2;--pink2:#7f8ba3;--prule:#26314a;--pedge:rgba(228,233,242,.22);--gutter:rgba(0,0,0,.55)}
+html,body{height:auto!important;min-height:100%}
+body{overflow:auto!important;background:var(--table)!important;color:var(--table-ink);font:14px/1.5 var(--text)!important;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 32px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.top,#unfocus,#labels{display:none!important}
+.spread,.turn{width:min(100%,calc((100vh - 150px) * 1.5),1600px)}
+.spread{display:grid;grid-template-columns:1fr 1fr;box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35);background:var(--paper);color:var(--pink)}
+.page{aspect-ratio:3/4;container-type:inline-size;position:relative;min-width:0;overflow:hidden}
+.in{height:100%;display:flex;flex-direction:column}
+.verso{background:linear-gradient(to left,var(--gutter),transparent 7%) var(--paper)}
+.verso .in{padding:7cqi 9cqi 6cqi 11cqi}
+.recto{background:var(--paper)}
+.vhead,.rhead{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--pink2)}
+.rhead,.recto .fo{position:absolute;left:0;right:0;padding-inline:9cqi 7cqi;z-index:2;pointer-events:none}
+.rhead{top:0;padding-top:7cqi}
+.recto .fo{bottom:0;padding-block:5cqi 6cqi;display:flex;justify-content:flex-end;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--pink2)}
+.vword{font:300 clamp(28px,8.6cqi,76px)/1 var(--mono)!important;margin:7cqi 0 0 -.05em!important;letter-spacing:-.05em!important;color:var(--pink);text-wrap:balance}
+.vword .pre{color:var(--pink2);margin-right:.25em}
+.vword .term{font:400 1.32em/1 var(--text);letter-spacing:-.01em}
+#capslot{margin-top:3.4cqi;min-height:24cqi}
+#cap{position:static!important;max-width:none!important;color:var(--pink)!important;text-shadow:none!important;font:400 clamp(12px,2.3cqi,19px)/1.42 var(--text)!important;margin:0}
+#cap b{display:block;font:italic 400 clamp(14px,3cqi,26px)/1.15 var(--text)!important;color:var(--pink)!important;margin-bottom:.4em}
+#stepslot{margin-top:2cqi}
+body:not(.studio) .stages{position:static!important;transform:none!important;display:flex!important;flex-wrap:wrap;gap:0!important;justify-content:flex-start!important;max-width:none!important}
+body:not(.studio) .stages button{font:500 clamp(8px,1.45cqi,11px)/1 var(--mono)!important;color:var(--pink2)!important;margin:0 1.4em 0 0!important;padding:0 0 .35em!important}
+body:not(.studio) .stages button[aria-pressed="true"]{color:var(--pink)!important}
+.colo{margin-top:auto;padding-top:1.4em;font:400 clamp(8.5px,1.5cqi,12px)/1.6 var(--mono);color:var(--pink2);display:grid;gap:.8em}
+.colo p{margin:0;max-width:62ch}.colo b{font-weight:500;color:var(--pink)}
+.colo button{font:inherit;color:var(--pink);background:none;border:0;border-bottom:1px solid var(--prule);padding:0;cursor:pointer}
+body.studio .stages{z-index:20}
+body.studio .stages{position:static!important;transform:none!important;width:auto!important;max-width:none!important;display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:6px!important;padding:0!important;background:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-radius:0!important}
+body.studio .stages .cl{flex-wrap:wrap!important;white-space:normal!important}
+body.studio .stages button{font-size:clamp(9px,1.6cqi,12px)!important;padding:.55em .8em!important}
+body.studio #capslot{min-height:0;display:none}
+body.studio .colo p:not(:last-child){display:none}
+body.studio #stepslot{margin-top:3cqi;flex:1 1 0;min-height:0;overflow:auto;scrollbar-width:thin}
+body.studio #grpD:not([hidden]){display:contents!important}
+.folio{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--pink2);margin-top:4cqi}
+.glbox{position:absolute;inset:0}
+#gl{position:absolute!important;inset:0;width:100%!important;height:100%!important}
+.load{position:absolute!important;color:var(--pink2)!important}
+.note{position:absolute;z-index:4;left:9cqi;top:13cqi;max-width:48cqi;pointer-events:none}
+#tip{position:static!important;min-width:0!important;max-width:none!important;width:auto!important;padding:1.8cqi 2.2cqi!important;box-shadow:none!important;border-radius:0!important;
+  background:color-mix(in srgb,var(--paper) 90%,transparent)!important;color:var(--pink)!important;border-left:1.4cqi solid var(--b,#fff)}
+#tip .poem{font:400 clamp(11px,2.2cqi,17px)/1.3 var(--text)!important;margin:0 0 .7em!important}
+#tip .poem span{display:block;margin-bottom:.2em}
+#tip .meta{font:400 clamp(8.5px,1.5cqi,12px)/1.6 var(--mono)!important;color:var(--pink2);border-top:0!important;padding-top:0!important;opacity:1!important}
+.hint{position:absolute;z-index:3;left:9cqi;bottom:5.2cqi;margin:0;font:400 clamp(8px,1.4cqi,11px)/1.5 var(--mono);color:var(--pink2);pointer-events:none}
+.turn{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline;font:500 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--table-ink)}
+.turn button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.turn button:disabled{opacity:.35;cursor:default}
+.grounds{flex-basis:100%;display:flex;justify-content:center;gap:16px}
+.grounds .cover{color:inherit;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.grounds .cover:hover,.grounds .cover:focus-visible{border-bottom-color:currentColor;outline:none}
+.grounds span{padding:4px 0;opacity:.5}
+.grounds button[aria-pressed="true"]{border-bottom:1px solid currentColor}
+.idx{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px}
+.idx a{color:inherit;text-decoration:none;opacity:.85;border-bottom:1px solid transparent}
+.idx a:hover{border-bottom-color:currentColor}
+.idx a[aria-current="true"]{opacity:1;border-bottom-color:currentColor}
+.idx sup{font-size:.75em;margin-left:2px}
+@media (max-width:760px){.spread{grid-template-columns:1fr;width:100%}.verso{aspect-ratio:auto}.verso .in{padding:9cqi 8cqi 7cqi}}
+
+.words{gap:4px 12px!important;max-width:min(640px,calc(100vw - 32px))!important}
+.words a{font:500 11px/1.6 var(--mono)!important}
+.words sup{font-size:.75em;margin-left:2px}
+body:not(.studio) .stages .modes,body:not(.studio) #grpS>.cl+.cl,body:not(.studio) #grpD,body:not(.studio) .stages>.cl:last-child{display:none!important}
+body:not(.studio) .stages{background:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;width:auto!important;padding:0!important}
+body:not(.studio) .stages .cl{background:none!important}
+body:not(.studio) .stages button{font:500 11px/1 var(--mono)!important;letter-spacing:.14em!important;text-transform:uppercase;color:var(--dim)!important;background:none!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;padding:6px 2px!important;margin:0 8px}
+body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important;border-bottom-color:currentColor!important}
+.cap{font:400 16px/1.45 var(--display)!important}
+.cap b{font:400 22px/1.15 var(--display)!important;font-style:normal!important}
+#tip .poem{font-family:var(--display)!important}
+</style>
+
+<div class="spread" id="spread" data-ground="night">
+  <section class="page verso" aria-label="Verso"><div class="in">
+    <div class="vhead"><span>Gathering</span><span id="pl-l"></span></div>
+    <h1 class="vword" id="h1"></h1>
+    <div id="capslot"></div>
+    <div id="stepslot"></div>
+    <div class="colo">
+      <p id="counts"></p>
+      <p><b>Gathering.</b> Each photograph sits on its own plane, the first furthest back. Its light is cut into eight bands and the band edges traced; every crossing of every photograph’s lines cuts a shard. Gathering, the shards travel forward and meet as the sheet, each in its named blue.</p>
+      <p><b>Studio.</b> Draw into the space, upload a diagram, change the light, pick layers and blues, save an image or a GIF. <button id="studio" type="button" aria-pressed="false">Open the studio</button></p>
+    </div>
+    <div class="folio"><span id="fo-l"></span><span></span></div>
+  </div></section>
+  <section class="page recto" aria-label="Recto">
+    <div class="glbox" id="glbox"></div>
+    <div class="rhead"><span id="pl-r"></span><span>Thinking Blue</span></div>
+    <div class="note" id="tipslot"></div>
+    <p class="hint">Drag to turn · scroll to move in and out · hover a shard for the captions that cut it</p>
+    <div class="fo"><span id="fo-r"></span></div>
+  </section>
+</div>
+<nav class="turn" aria-label="Words">
+  <button id="prev" type="button">← previous</button>
+  <div class="idx" id="idx"></div>
+  <button id="next" type="button">next →</button>
+  <div class="grounds" role="group" aria-label="Ground"><a class="cover" href="../">← Thinking Blue</a><span aria-hidden="true">·</span><button type="button" data-g="paper" aria-pressed="false">paper</button><button type="button" data-g="night" aria-pressed="true">blue-black</button></div>
+</nav>
+<canvas id="gl" aria-label="A word's photographs, their traced contours, the shards they cut, gathering into the sheet"></canvas>
+<div class="load" id="loading">GATHERING THE PHOTOGRAPHS…</div>
+<div class="top">
+  <div><p class="eyebrow" id="eyebrow"></p><nav class="words" id="words" aria-label="Words"></nav></div>
+</div>
+<div class="stages" role="toolbar" aria-label="Sculpture and diagram">
+  <span class="cl modes"><button id="mS" aria-pressed="true" title="The sculpture's menu">Sculpture</button><button id="vS" class="eye" aria-pressed="true" title="Show or hide the sculpture">on</button><button id="mD" aria-pressed="false" title="The diagram's menu">Diagram</button><button id="vD" class="eye" aria-pressed="true" title="Show or hide the diagram">on</button></span>
+  <span id="grpS" class="grp">
+    <span class="cl"><button id="loop" aria-pressed="true" title="Play through, then keep coming apart and gathering">Play</button><button data-t="1" aria-pressed="false">Photographs</button><button data-t="2" aria-pressed="false">Contours</button><button data-t="3" aria-pressed="false">Shards</button><button data-t="4" aria-pressed="false">Gathered</button></span>
+    <span class="cl"><span class="lbl">show</span><button id="phbtn" class="sm" aria-pressed="true" title="Show or hide the photographs">photos</button><button id="lnbtn" class="sm" aria-pressed="true" title="Show or hide the traced contours">lines</button><button id="shbtn" class="sm" aria-pressed="true" title="Show or hide the shards">shards</button><button id="hvbtn" class="sm" aria-pressed="false" title="Lift a shard and show its captions when you point at it">hover</button></span>
+    <span class="cl"><label class="lbl" style="display:flex;align-items:center;gap:6px" title="Deepen the blues only: CIELAB hue 220–300°, the method's own blue band">blues <input type="range" id="chroma" min="0.5" max="3" step="0.01" value="1.3" style="width:80px;accent-color:var(--accent)"></label></span>
+    <span class="cl"><button id="bluesbtn" class="sm" aria-pressed="false" aria-controls="bl" title="Tick the photographs whose layers you want to see">layers ▾</button><button id="bluesbtn2" class="sm" aria-pressed="false" aria-controls="blp" title="Tick named blues to colour their shards">blues ▾</button><button id="clearnames" class="sm" hidden title="Remove the names placed behind the sculpture">clear names</button></span>
+  </span>
+  <span id="grpD" class="grp" hidden>
+    <span class="cl"><span class="lbl">tool</span><button class="sm tool" data-tool="turn" aria-pressed="true" title="Drag to turn the sculpture">turn</button><button class="sm tool" data-tool="pen" aria-pressed="false" title="Draw freely">pen</button><button class="sm tool" data-tool="line" aria-pressed="false" title="Drag a straight line">line</button><button class="sm tool" data-tool="dot" aria-pressed="false" title="Place a dot">dot</button><button class="sm tool" data-tool="connect" aria-pressed="false" title="Click one dot, then another, to join them">connect</button></span>
+    <span class="cl"><span id="swatches" class="swatches" role="group" aria-label="Colour"></span></span>
+    <span class="cl"><span class="lbl">width</span><button class="sm wd" data-w="0" aria-pressed="false" title="hairline">╌</button><button class="sm wd" data-w="1" aria-pressed="true" title="fine">─</button><button class="sm wd" data-w="2" aria-pressed="false" title="medium">━</button><button class="sm wd" data-w="3" aria-pressed="false" title="bold">▬</button></span>
+    <span class="cl"><span class="lbl">style</span><button class="sm st" data-st="solid" aria-pressed="true" title="solid">solid</button><button class="sm st" data-st="dashed" aria-pressed="false" title="dashed">dash</button><button class="sm st" data-st="dotted" aria-pressed="false" title="dotted">dots</button></span>
+    <span class="cl"><span class="lbl">arrow</span><button class="sm ar" data-ar="0" aria-pressed="true" title="no arrows">none</button><button class="sm ar" data-ar="1" aria-pressed="false" title="arrow at the end">→</button><button class="sm ar" data-ar="2" aria-pressed="false" title="arrows at both ends">↔</button></span>
+    <span class="cl"><select id="fillsel" class="sel" aria-label="Fill for drawn shapes" title="What fills the shapes you draw with the pen"><option value="-1">no fill</option></select><button id="undo2" class="sm" title="Undo your last mark">undo</button><button id="clear2" class="sm" title="Clear your marks">clear</button><button id="dgbtn" class="sm" aria-pressed="false" title="Upload a diagram to etch into the photographs or float in the space">upload</button></span>
+  </span>
+  <span class="cl"><button id="movebtn" class="sm" aria-pressed="false" title="Drag to slide the sculpture to another spot (or alt-drag, or middle-drag, any time)">move</button><button id="recentre" class="sm" title="Put the sculpture back in the middle">recentre</button><button id="zin" class="sm" aria-label="Move in" title="Move in (hold, or +, or scroll)">in</button><button id="zout" class="sm" aria-label="Move out" title="Move out (hold, or −, or scroll)">out</button><button id="saveimg" class="sm" hidden title="Save this view as a very large PNG">save image</button><button id="lightbtn" class="sm" aria-pressed="false" aria-controls="lightp" title="Light and blues">light ▾</button><button id="gifbtn" class="sm" aria-pressed="false" aria-controls="gifp" title="Record the sculpture as a looping GIF">save gif</button><button id="focusbtn" class="sm" title="Hide all text and controls (F)">focus</button></span>
+</div>
+<button id="unfocus" hidden title="Show the text and controls again (Esc)">show controls</button>
+<p class="cap" id="cap"></p>
+<div id="labels"></div>
+<div id="tip" hidden></div>
+<aside id="bl" hidden aria-label="Select layers and named blues">
+  <h2>Layers</h2>
+  <p>Only the ticked photographs are shown, with their contours and shards.</p>
+  <div class="row"><button id="lyall">all</button><button id="lynone">none</button></div>
+  <div id="lylist"></div>
+</aside>
+<aside id="blp" class="pick" hidden aria-label="Named blues">
+  <h2>Named blues</h2>
+  <p>Ticked blues colour their shards in that blue, on the photographs and in the sheet.</p>
+  <div class="row"><button id="blall">all</button><button id="blnone">none</button><label style="display:flex;grid-template-columns:none;gap:6px;padding:0 4px"><input type="checkbox" id="blhide"> hide the others</label></div>
+  <div id="bllist"></div>
+</aside>
+<aside id="lightp" class="pick" hidden aria-label="Light and blues">
+  <h2>Light and blues</h2>
+  <p>For the photographs and shards. The blues sliders touch only the method's blue band, CIELAB hue 220–300°.</p>
+  <label class="gl">brightness<input type="range" data-u="uExpo" min=".5" max="1.8" step=".01" value="1"></label>
+  <label class="gl">contrast<input type="range" data-u="uContrast" min=".6" max="1.7" step=".01" value="1"></label>
+  <label class="gl">sheen<input type="range" data-u="uSheen" min="0" max="3" step=".01" value="1"></label>
+  <label class="gl">cool light<input type="range" data-u="uCool" min="0" max="1" step=".01" value="0"></label>
+  <label class="gl">blue light<input type="range" data-u="uBlueL" min="0" max="1" step=".01" value="0"></label>
+  <label class="gl">blue depth<input type="range" data-u="uChroma" min=".5" max="3" step=".01" value="1.3"></label>
+  <label class="gl">room<input type="range" id="room" min="0" max="1" step=".01" value="0"></label>
+  <div class="row" style="margin-top:8px"><button id="lightreset">reset</button></div>
+</aside>
+<aside id="gifp" class="pick" hidden aria-label="Save a GIF">
+  <h2>Save a GIF</h2>
+  <p>Records only the sculpture, no text. Set it up first (a step, a word, Play), then record.</p>
+  <label class="gl">length <select id="giflen"><option value="3">3 seconds</option><option value="6" selected>6 seconds</option><option value="10">10 seconds</option></select></label>
+  <label class="gl">motion <select id="gifmo"><option value="turn" selected>a full turn around it</option><option value="as">as it moves on screen</option></select></label>
+  <label class="gl">size <select id="gifw"><option value="480">480 px wide</option><option value="720" selected>720 px wide</option><option value="1080">1080 px wide</option></select></label>
+  <div class="row" style="margin-top:10px"><button id="gifgo">record</button><span id="gifst" class="n" style="font:500 10.5px var(--mono);color:var(--dim);align-self:center"></span></div>
+</aside>
+<aside id="dg" hidden aria-label="Diagrams in the space">
+  <h2>Diagrams</h2>
+  <p id="dgnote">Diagrams entered into the space float among the shards: images you add (the paper drops away and only the lines stay) and lines drawn in place.</p>
+  <div class="row" id="dgadd" hidden><label class="btn" style="display:inline-block">Add a diagram<input type="file" id="file" accept="image/*" hidden></label></div>
+  <div id="dglist"></div>
+  <div class="item" id="strokes" hidden><span style="font:500 10.5px var(--mono);color:var(--dim)"></span><div class="row"><button id="undo">Undo last line</button><button id="clear">Clear lines</button></div><p style="margin:0">Use Draw (top) to draw straight into the space.</p></div>
+</aside>
+<pre id="diag" hidden style="position:fixed;left:8px;right:8px;top:8px;max-height:45vh;overflow:auto;z-index:20;background:#000c;color:#9fc4ff;font:11px/1.4 var(--mono);padding:10px;white-space:pre-wrap;margin:0"></pre>
+<script>/* diagnostics, shown only with #debug on the link */
+(function(){const on=location.hash==="#debug",out=[];const show=()=>{if(!on)return;const d=document.getElementById("diag");if(d){d.hidden=false;d.textContent=out.join("\n")}};
+  window.__diag=m=>{out.push(String(m).slice(0,1500));show()};
+  for(const k of ["error","warn"]){const o=console[k].bind(console);console[k]=(...a)=>{window.__diag(k+": "+a.map(x=>x&&x.message?x.message:String(x)).join(" "));o(...a)}}
+  addEventListener("error",e=>window.__diag("onerror: "+e.message));addEventListener("unhandledrejection",e=>window.__diag("rejection: "+(e.reason&&e.reason.message||e.reason)));
+  addEventListener("DOMContentLoaded",show)})();</script>
+<script>
+(()=>{const m=(id,to)=>document.getElementById(to).append(document.getElementById(id));
+  m("gl","glbox");m("loading","glbox");m("cap","capslot");const st=document.querySelector(".stages");document.getElementById("stepslot").append(st);m("tip","tipslot");
+  const b=document.getElementById("studio");b.onclick=()=>{const on=!document.body.classList.contains("studio");document.body.classList.toggle("studio",on);b.setAttribute("aria-pressed",on);
+    b.textContent=on?"Close the studio":"Open the studio";dispatchEvent(new Event("resize"))}})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+/* the words: each its own sculpture; blue sky's files sit at the top level, the others in their folders */
+const WORDS=[["blue-sky","blue sky"],["sea","sea"],["twilight","twilight"],["sad","sad"],["calm","calm"],["melancholy","melancholy"],["lonely","lonely"],["cold","cold"],["dream","dream"],["memory","memory"],["blue-eyes","blue eyes"],["blue-fabric","blue fabric"],["blues","blues"]];
+const WORD=(WORDS.find(w=>"#"+w[0]===location.hash)||WORDS[0])[0],LABEL=WORDS.find(w=>w[0]===WORD)[1],BASE=WORD==="blue-sky"?"":WORD+"/";
+const NUMW={10:"ten",11:"eleven",12:"twelve",13:"thirteen",14:"fourteen",15:"fifteen",16:"sixteen"};
+addEventListener("hashchange",()=>location.reload());
+function setFocus(on){document.body.classList.toggle("focus",on);$("#unfocus").hidden=!on;if(on)$("#unfocus").focus({preventScroll:true})}
+addEventListener("DOMContentLoaded",()=>{$("#focusbtn").onclick=()=>setFocus(true);$("#unfocus").onclick=()=>setFocus(false)});
+addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea,select"))return;if(e.key==="Escape")setFocus(false);if(e.key==="f"||e.key==="F")setFocus(!document.body.classList.contains("focus"))});
+const fmt=n=>n.toLocaleString("en-CA");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let D,N,K;
+const renderer=new THREE.WebGLRenderer({canvas:$("#gl"),antialias:true});
+let roomCol=new THREE.Color(0x070b16);
+renderer.setPixelRatio(Math.min(2,devicePixelRatio));renderer.setClearColor(roomCol,1);
+const scene=new THREE.Scene(),pickScene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(34,1,.01,60);
+const Z0=-.24,ZS=.13;const ZK=m=>Z0-(K-1-m)*ZS;   /* photograph m's plane: the first furthest back, the sheet in front of them all */
+const rnd=i=>{const x=Math.sin(i*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
+const ease=x=>x*x*(3-2*x);
+/* the steps: t runs 0 to 4 — photographs appear (0-1), contours draw (1-2), shards break (2-3), gathering (3-4) */
+let t=0,tGoal=4,loopOn=!RM,hold=0;
+const SPEED=[1/7,1/6,1/5,1/17];
+const gOf=m=>Math.max(0,Math.min(1,((t-3)-m/(K-1)*.45)/.3));   /* photograph m's lines and shards leave in turn and take .3 to arrive */
+
+/* the wind: the traced lines are contours of the photographs' light, like isobars; shards and lines sway along them,
+   harder where they crowd, the way wind runs along isobars and strengthens where they tighten */
+function windAt(X,Y){const g=D.wind;if(!g)return[0,0,0];const [x0,y0,x1,y1]=g.frame;const fx=Math.max(0,Math.min(g.w-1,(X-x0)/(x1-x0)*(g.w-1))),fy=Math.max(0,Math.min(g.h-1,(Y-y0)/(y1-y0)*(g.h-1)));
+  const i=Math.round(fy)*g.w+Math.round(fx),d=g.data;return[d[i*3],d[i*3+1],d[i*3+2]]}
+
+const U={uBlueL:{value:0},uExpo:{value:1},uContrast:{value:1},uCool:{value:0},uSheen:{value:1},uSelLAll:{value:1},uSelL:{value:Array.from({length:4},()=>new THREE.Vector4(1,1,1,1))},uSelK:{value:-1},uSelName:{value:-1},uHide:{value:0},uSel:{value:Array.from({length:32},()=>new THREE.Vector4(0,0,0,0))},uPal:{value:Array.from({length:128},()=>new THREE.Vector3())},uH:{value:800},uDir:{value:1},uTime:{value:0},uShard:{value:0},uT:{value:0},uK:{value:13},uN:{value:1},uZ0:{value:Z0},uZS:{value:ZS},uHover:{value:-1},uLift:{value:0},uChroma:{value:1.3},
+  uSheet:{value:null},uAtlas:{value:null},uPage:{value:new THREE.Vector2(1314,1746)},uFrame:{value:new THREE.Vector4(0,0,1,1)}};
+const VS=`
+attribute vec3 aLocal,aNrm,aHome,aWind;attribute vec2 aPg;attribute float aId,aRim,aMask,aSeed,aName;uniform float uHide;uniform vec4 uSel[32];uniform vec3 uPal[128];varying float vTint;varying vec3 vNamed;
+uniform float uLayer,uTime,uShard,uT,uK,uN,uZ0,uZS,uHover,uLift,uSheen;uniform vec2 uPage;uniform vec4 uFrame;
+varying vec2 vUvS,vUvP;varying float vE,vShade,vRim,vPick;
+vec3 rot(vec3 v,vec3 k,float a){return v*cos(a)+cross(k,v)*sin(a)+k*dot(k,v)*(1.-cos(a));}
+void main(){
+  /* this copy exists only if photograph uLayer's lines helped cut the shard */
+  float has=mod(floor(aMask/pow(2.,uLayer)+.5),2.);
+  float sh=clamp(uShard*1.6-aSeed*.6,0.,1.);
+  float tk=aName<0.?0.:dot(uSel[int(aName/4.)],vec4(equal(vec4(mod(aName,4.)),vec4(0.,1.,2.,3.))));   /* is this shard's blue ticked */
+  if(has<.5||sh<=0.||(uHide>.5&&tk<.5)){gl_Position=vec4(2.,2.,2.,1.);vTint=0.;vNamed=vec3(0.);vE=0.;vShade=0.;vRim=0.;vPick=0.;vUvS=vec2(0.);vUvP=vec2(0.);return;}
+  float g=clamp(((uT-3.)-uLayer/(uK-1.)*.45)/.3,0.,1.);float e=g*g*(3.-2.*g);float fly=sin(3.14159*e);
+  float zL=uZ0-(uK-1.-uLayer)*uZS;
+  vec3 c=vec3(aHome.xy,mix(zL,0.,e));
+  vec3 wd=vec3(aWind.x,-aWind.y,0.);float ws=aWind.z;float sway=sin(uTime*(.3+.55*ws)+aSeed*6.2832);
+  c+=wd*sway*(.003+.02*ws)*(1.-.7*e)+wd*fly*(.06+.22*ws)+vec3(0.,0.,fly*.04*(aSeed-.5));
+
+  float sc=sh*mix(.9,1.,e);   /* cracked apart on its photograph, closed up in the sheet */
+  bool hov=abs(aId+uLayer*uN-uHover)<.5;if(hov)sc*=1.+1.2*uLift;
+  vec3 axis=normalize(vec3(sin(aSeed*91.),cos(aSeed*47.),sin(aSeed*13.)+.3));
+  float ang=fly*6.2832*(.4+aSeed)+(1.-e)*.35*ws*sway+(1.-sh)*1.2;if(hov)ang*=1.-uLift;
+  vec3 l=rot(aLocal*vec3(sc,sc,1.),axis,ang);vec3 n=rot(aNrm,axis,ang);
+  c.z+=(1.-sh)*.06;
+  vec4 mv=modelViewMatrix*vec4(c+l,1.);if(hov)mv.z+=.2*uLift;
+  vec3 nv=normalize(normalMatrix*n);vec3 L=normalize(vec3(-.45,.6,.65));vec3 V=normalize(-mv.xyz);vec3 Hh=normalize(L+V);
+  float dif=abs(dot(nv,L)),spec=pow(abs(dot(nv,Hh)),aRim>.5?18.:60.);
+  vShade=.84+.16*dif+(aRim>.5?.4:.22)*spec*uSheen;   /* sheen: how much the shards catch the light */
+  /* where this shard sits in the sheet's image, and in its own photograph (13 photographs, 4 by 4 in one atlas) */
+  vUvS=vec2(aPg.x/uPage.x,1.-aPg.y/uPage.y);
+  vec2 f=vec2((aPg.x-uFrame.x)/(uFrame.z-uFrame.x),(aPg.y-uFrame.y)/(uFrame.w-uFrame.y));
+  float col=mod(uLayer,4.),row=floor(uLayer/4.);vUvP=vec2((col+clamp(f.x,0.,1.))/4.,1.-(row+clamp(f.y,0.,1.))/4.);
+  vTint=tk;vNamed=aName<0.?vec3(0.):uPal[int(aName)];vE=e;vRim=aRim;vPick=aId+uLayer*uN+1.;gl_Position=projectionMatrix*mv;}`;
+const FS=`precision highp float;uniform sampler2D uSheet,uAtlas;uniform float uChroma;varying vec2 vUvS,vUvP;varying float vE,vShade,vRim,vPick,vTint;varying vec3 vNamed;
+
+uniform float uBlueL,uExpo,uContrast,uCool;
+vec3 lin_(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),step(.04045,c));}
+vec3 srgb_(vec3 c){c=max(c,0.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
+vec3 lab_(vec3 c){vec3 l=lin_(c);vec3 x=vec3(dot(l,vec3(.4124,.3576,.1805))/.95047,dot(l,vec3(.2126,.7152,.0722)),dot(l,vec3(.0193,.1192,.9505))/1.08883);
+  vec3 f=mix(7.787*x+16./116.,pow(x,vec3(1./3.)),step(.008856,x));return vec3(116.*f.y-16.,500.*(f.x-f.y),200.*(f.y-f.z));}
+vec3 unlab_(vec3 L){float fy=(L.x+16.)/116.,fx=fy+L.y/500.,fz=fy-L.z/200.;vec3 f=vec3(fx,fy,fz);vec3 x=mix((f-16./116.)/7.787,f*f*f,step(.2069,f));
+  x*=vec3(.95047,1.,1.08883);vec3 l=vec3(dot(x,vec3(3.2406,-1.5372,-.4986)),dot(x,vec3(-.9689,1.8758,.0415)),dot(x,vec3(.0557,-.2040,1.0570)));return clamp(srgb_(l),0.,1.);}
+vec3 blues_(vec3 c,float k){vec3 L=lab_(c);float C=length(L.yz),h=mod(degrees(atan(L.z,L.y))+360.,360.);
+  float w=smoothstep(205.,222.,h)*(1.-smoothstep(298.,315.,h))*smoothstep(2.,6.,C);return unlab_(vec3(L.x+uBlueL*w*(100.-L.x)*.4,L.yz*mix(1.,k,w)));}   /* blue light lifts only the blues */
+vec3 grade_(vec3 c){c=(c-.5)*uContrast+.5;c*=uExpo;c=mix(c,c*vec3(.86,.97,1.14),uCool);return clamp(c,0.,1.);}
+void main(){vec3 p=texture2D(uAtlas,vUvP).rgb,s=texture2D(uSheet,vUvS).rgb;vec3 c=blues_(mix(mix(p,s,vE),vNamed,vTint*(1.-.6*vE)),uChroma);   /* a ticked blue shows its named colour, on its photograph too */   /* only the blues deepen */
+  c=mix(c,vec3(.93,.96,1.),vRim*.25);gl_FragColor=vec4(grade_(min(c*vShade,vec3(1.))),1.);}`;
+const FSPICK=`precision highp float;varying vec2 vUvS,vUvP;varying float vE,vShade,vRim,vPick;
+void main(){float i=vPick;gl_FragColor=vec4(mod(i,256.)/255.,mod(floor(i/256.),256.)/255.,floor(i/65536.)/255.,1.);}`;
+
+let meshes=[],photoPlanes=[],NM=null;
+/* the photographs, drawn with the same colour control as the shards */
+const PVS=`uniform vec2 uRep,uOff;varying vec2 vUv;void main(){vUv=uv*uRep+uOff;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const ETCH={uEtch:{value:null},uCuts:{value:null},uEtchOn:{value:0},uEtchWhite:{value:1},uEtchOp:{value:1},uEtchFit:{value:new THREE.Vector2(1,1)}};
+const PFS=`precision highp float;uniform sampler2D uMap,uEtch,uCuts;uniform float uOp,uChroma,uEtchOn,uEtchWhite,uEtchOp;uniform vec2 uRep,uOff,uEtchFit;varying vec2 vUv;
+
+uniform float uBlueL,uExpo,uContrast,uCool;
+vec3 lin_(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),step(.04045,c));}
+vec3 srgb_(vec3 c){c=max(c,0.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
+vec3 lab_(vec3 c){vec3 l=lin_(c);vec3 x=vec3(dot(l,vec3(.4124,.3576,.1805))/.95047,dot(l,vec3(.2126,.7152,.0722)),dot(l,vec3(.0193,.1192,.9505))/1.08883);
+  vec3 f=mix(7.787*x+16./116.,pow(x,vec3(1./3.)),step(.008856,x));return vec3(116.*f.y-16.,500.*(f.x-f.y),200.*(f.y-f.z));}
+vec3 unlab_(vec3 L){float fy=(L.x+16.)/116.,fx=fy+L.y/500.,fz=fy-L.z/200.;vec3 f=vec3(fx,fy,fz);vec3 x=mix((f-16./116.)/7.787,f*f*f,step(.2069,f));
+  x*=vec3(.95047,1.,1.08883);vec3 l=vec3(dot(x,vec3(3.2406,-1.5372,-.4986)),dot(x,vec3(-.9689,1.8758,.0415)),dot(x,vec3(.0557,-.2040,1.0570)));return clamp(srgb_(l),0.,1.);}
+vec3 blues_(vec3 c,float k){vec3 L=lab_(c);float C=length(L.yz),h=mod(degrees(atan(L.z,L.y))+360.,360.);
+  float w=smoothstep(205.,222.,h)*(1.-smoothstep(298.,315.,h))*smoothstep(2.,6.,C);return unlab_(vec3(L.x+uBlueL*w*(100.-L.x)*.4,L.yz*mix(1.,k,w)));}   /* blue light lifts only the blues */
+vec3 grade_(vec3 c){c=(c-.5)*uContrast+.5;c*=uExpo;c=mix(c,c*vec3(.86,.97,1.14),uCool);return clamp(c,0.,1.);}
+void main(){vec3 c=blues_(texture2D(uMap,vUv).rgb,uChroma);
+  if(uEtchOn>.5){vec2 lu=(vUv-uOff)/uRep,eu=(lu-.5)*uEtchFit+.5;
+    if(eu.x>=0.&&eu.x<=1.&&eu.y>=0.&&eu.y<=1.){vec4 t=texture2D(uEtch,eu);float lum=dot(t.rgb,vec3(.299,.587,.114));
+      float a=smoothstep(.82,.45,lum)*t.a*(1.-texture2D(uCuts,vUv).r)*uEtchOp;   /* etched only where this photograph's lines cut nothing */
+      c=mix(c,mix(t.rgb,vec3(1.),uEtchWhite),a);}}
+  gl_FragColor=vec4(grade_(c),uOp);}`;
+async function build(){
+  const [S,L,C]=await Promise.all(["sheet.json","lines.json","colours.json"].map(f=>fetch(BASE+f).then(r=>r.json())));
+  try{NM=await (await fetch(BASE+"names.json")).json()}catch(e){NM=null}
+  D=S;N=D.faces.length;K=D.photos.length;D.wind=C.wind;U.uK.value=K;U.uN.value=N;
+  const tl=new THREE.TextureLoader();const [tS,tA,tC]=await Promise.all(["sheet.jpg","photos.jpg","cuts.png"].map(f=>new Promise((res,rej)=>tl.load(BASE+f,res,undefined,rej))));ETCH.uCuts.value=tC;ETCH.uEtch.value=tC;
+  for(const tx of [tS,tA]){tx.minFilter=THREE.LinearFilter;tx.generateMipmaps=false}
+  U.uSheet.value=tS;U.uAtlas.value=tA;U.uFrame.value.set(...D.frame);
+  const W=D.W,H=D.H,s=1/1000;
+  /* which photographs' lines cut each shard */
+  const mask=new Float64Array(N);D.photos.forEach((p,m)=>p.faces.forEach(f=>{if(f>=0&&f<N&&!(Math.floor(mask[f]/2**m)%2))mask[f]+=2**m}));
+  for(let i=0;i<N;i++)if(!mask[i])mask[i]=2**(K-1);
+  D.mask=mask;D.cutters=Array.from(mask,v=>{const o=[];for(let m=0;m<K;m++)if(Math.floor(v/2**m)%2)o.push(m);return o});
+  /* geometry: every face a bevelled shard, both sides carrying its colour */
+  const FLAT=N>30000,TH=.007,BEV=.0045;let nv=0,ni=0;const tris=[];   /* a very large sheet gets flat shards, coloured both sides, to stay smooth */
+  for(const f of D.faces){const c=f[4],pts=[];for(let i=0;i<c.length;i+=2)pts.push(new THREE.Vector2(c[i],-c[i+1]));
+    const n=c.length/2;   /* counted before triangulating: the triangulator drops a repeated end point */
+    let tr=[];try{tr=THREE.ShapeUtils.triangulateShape(pts,[])}catch(e){}tris.push(tr);nv+=FLAT?n:6*n;ni+=FLAT?tr.length*3:tr.length*6+6*n}
+  const A={aName:new Float32Array(nv),aLocal:new Float32Array(nv*3),aNrm:new Float32Array(nv*3),aHome:new Float32Array(nv*3),aWind:new Float32Array(nv*3),aPg:new Float32Array(nv*2),aId:new Float32Array(nv),aRim:new Float32Array(nv),aMask:new Float32Array(nv),aSeed:new Float32Array(nv)},idx=new Uint32Array(ni);
+  let v=0,ii=0;D.hx=new Float32Array(N);D.hy=new Float32Array(N);
+  D.faces.forEach((f,i)=>{const c=f[4],n=c.length/2,hx=(f[0]-W/2)*s,hy=-(f[1]-H/2)*s,sd=rnd(i+.5),w=windAt(f[0],f[1]);D.hx[i]=hx;D.hy[i]=hy;
+    const put=(x,y,z,nx,ny,nz,rim)=>{A.aLocal.set([x,y,z],v*3);A.aNrm.set([nx,ny,nz],v*3);A.aHome.set([hx,hy,0],v*3);A.aWind.set(w,v*3);
+      A.aPg.set([f[0]+x/s,f[1]-y/s],v*2);A.aId[v]=i;A.aRim[v]=rim;A.aMask[v]=mask[i];A.aSeed[v]=sd;A.aName[v]=NM?NM.f[i]:-1;return v++};
+    const ox=[],oy=[],bx=[],by=[];for(let j=0;j<n;j++){ox.push(c[2*j]*s);oy.push(-c[2*j+1]*s);const d=Math.hypot(ox[j],oy[j])||1e-6;bx.push(ox[j]+ox[j]/d*BEV);by.push(oy[j]+oy[j]/d*BEV)}
+    const t0=v;for(let j=0;j<n;j++)put(ox[j],oy[j],FLAT?0:TH/2,0,0,1,0);
+    if(FLAT){for(const q of tris[i]){idx[ii++]=t0+q[0];idx[ii++]=t0+q[1];idx[ii++]=t0+q[2]}return}
+    const b0=v;for(let j=0;j<n;j++)put(bx[j],by[j],-TH/2,0,0,-1,0);
+    for(const q of tris[i]){idx[ii++]=t0+q[0];idx[ii++]=t0+q[1];idx[ii++]=t0+q[2];idx[ii++]=b0+q[2];idx[ii++]=b0+q[1];idx[ii++]=b0+q[0]}
+    for(let j=0;j<n;j++){const j2=(j+1)%n,ex=ox[j2]-ox[j],ey=oy[j2]-oy[j],el=Math.hypot(ex,ey)||1e-6,nx=ey/el,ny=-ex/el;
+      const a=put(ox[j],oy[j],TH/2,nx,ny,.6,1),b=put(ox[j2],oy[j2],TH/2,nx,ny,.6,1),c2=put(bx[j2],by[j2],-TH/2,nx,ny,.6,1),d2=put(bx[j],by[j],-TH/2,nx,ny,.6,1);
+      idx[ii++]=a;idx[ii++]=b;idx[ii++]=c2;idx[ii++]=a;idx[ii++]=c2;idx[ii++]=d2}});
+  const geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.BufferAttribute(A.aLocal,3));
+  for(const [k,arr] of Object.entries(A))geo.setAttribute(k,new THREE.BufferAttribute(arr,arr.length/nv));
+  geo.setIndex(new THREE.BufferAttribute(idx,1));geo.boundingSphere=new THREE.Sphere(new THREE.Vector3(),5);
+  /* one copy of the sheet per photograph: each draws only the shards that photograph's lines helped cut */
+  for(let m=0;m<K;m++){const u={...U,uLayer:{value:m}};
+    const me=new THREE.Mesh(geo,new THREE.ShaderMaterial({uniforms:u,vertexShader:VS,fragmentShader:FS,side:THREE.DoubleSide}));me.frustumCulled=false;scene.add(me);meshes.push(me);
+    const pk=new THREE.Mesh(geo,new THREE.ShaderMaterial({uniforms:u,vertexShader:VS,fragmentShader:FSPICK,side:THREE.DoubleSide}));pk.frustumCulled=false;pickScene.add(pk);pk.userData.of=me}
+  /* the photographs, each on its plane */
+  const pw=W*s,ph=H*s,[fx0,fy0,fx1,fy1]=D.frame;
+  D.photos.forEach((p,m)=>{const tex=tA.clone();tex.needsUpdate=true;tex.repeat.set(1/4,1/4);tex.offset.set((m%4)/4,1-(Math.floor(m/4)+1)/4);
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry((fx1-fx0)*s,(fy1-fy0)*s),new THREE.ShaderMaterial({uniforms:{...ETCH,uMap:{value:tA},uRep:{value:new THREE.Vector2(1/4,1/4)},uOff:{value:new THREE.Vector2((m%4)/4,1-(Math.floor(m/4)+1)/4)},uOp:{value:0},uChroma:U.uChroma,uBlueL:U.uBlueL,uExpo:U.uExpo,uContrast:U.uContrast,uCool:U.uCool},vertexShader:PVS,fragmentShader:PFS,transparent:true,depthWrite:true,side:THREE.DoubleSide}));
+    pl.position.set(((fx0+fx1)/2-W/2)*s,-((fy0+fy1)/2-H/2)*s,ZK(m)-.006);pl.renderOrder=-1;scene.add(pl);photoPlanes.push(pl)});
+  buildLines(L);fillSelects();fillSwatches();loadLocal();
+  if(!window.claude){$("#saveimg").hidden=false}   /* on a plain website the image downloads directly */   /* the colour splashes are switched off (buildSplashes stays, unused) */
+  { const gl=renderer.getContext();window.__diag(`webgl2 ${renderer.capabilities.isWebGL2} · vertices ${nv} · indices ${ni} · copies ${D.photos.reduce((a,p)=>a+p.faces.length,0)}`);
+    try{const dbg=gl.getExtension("WEBGL_debug_renderer_info");if(dbg)window.__diag("gpu "+gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL))}catch(e){}
+    U.uShard.value=1;U.uT.value=3;renderer.render(scene,camera);window.__diag("draw · gl error "+gl.getError());U.uShard.value=0;U.uT.value=0}
+  $("#counts").textContent=`${K} photographs · ${fmt(N)} shards · ${D.lines?"":""}traced in eight lightness bands. Unsplash search “${LABEL}”.`;
+  $("#loading").hidden=true;resize();caption();requestAnimationFrame(loop)}
+{const PL=["blue-sky","twilight","sea","dream","sad","calm","lonely","melancholy","blue-eyes","cold","blue-fabric","blues","memory"],nav=$("#words");
+  PL.forEach((w,k)=>{const l=WORDS.find(x=>x[0]===w)[1],a=document.createElement("a");a.href="#"+w;a.innerHTML=`${l}<sup>${k+1}</sup>`;if(w===WORD)a.setAttribute("aria-current","page");nav.append(a)});
+  $("#h1").innerHTML=`<span class="pre">blue:</span><span class="term">${LABEL}</span>`;
+  const pn=PL.indexOf(WORD)+1;$("#pl-l").textContent="Plate "+pn;$("#pl-r").textContent=LABEL;$("#fo-l").textContent=String(2*pn);$("#fo-r").textContent=String(2*pn+1);
+  $("#idx").append(...nav.children);
+  $("#prev").disabled=pn===1;$("#next").disabled=pn===PL.length;
+  $("#prev").onclick=()=>{location.hash=PL[pn-2]};$("#next").onclick=()=>{location.hash=PL[pn]};
+  document.querySelectorAll(".grounds button").forEach(b=>b.onclick=()=>{$("#spread").dataset.ground=b.dataset.g;document.querySelectorAll(".grounds button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    const c=new THREE.Color(getComputedStyle($("#spread")).getPropertyValue("--paper").trim());roomCol.copy(c);renderer.setClearColor(roomCol,1);try{localStorage.setItem("tb-ground",b.dataset.g)}catch(e){}});
+  try{const g=localStorage.getItem("tb-ground");if(g)document.querySelector(`.grounds button[data-g="${g}"]`).click()}catch(e){}}
+
+/* ---------- splashes: as each shard lands in the sheet it bursts into a blot of its own colour, with droplets, and settles back ---------- */
+const SVS=`attribute vec3 aHome;attribute vec2 aPg;attribute float aMask,aSeed,aR,aName;
+uniform float uLayer,uT,uK,uDir,uH,uSelName;uniform vec2 uPage;varying vec2 vUv;varying float vA,vSeed;
+void main(){float has=mod(floor(aMask/pow(2.,uLayer)+.5),2.);float arr=3.+uLayer/(uK-1.)*.45+.3+aSeed*.004,tau=(uT-arr)*17.;
+  if(has<.5||uDir<0.||tau<=0.||tau>2.2||(uSelName>=0.&&abs(aName-uSelName)>.5)){gl_Position=vec4(2.,2.,2.,1.);gl_PointSize=0.;vA=0.;vUv=vec2(0.);vSeed=0.;return;}
+  float grow=smoothstep(0.,.3,tau),fade=1.-smoothstep(.6,2.2,tau);
+  vec4 mv=modelViewMatrix*vec4(aHome.xy,.012,1.);gl_Position=projectionMatrix*mv;
+  gl_PointSize=min(256.,aR*(1.4+2.6*grow)*uH*projectionMatrix[1][1]/max(.05,-mv.z));
+  vUv=vec2(aPg.x/uPage.x,1.-aPg.y/uPage.y);vA=fade*grow;vSeed=aSeed;}`;
+const SFS=`precision highp float;uniform sampler2D uSheet;uniform float uChroma;varying vec2 vUv;varying float vA,vSeed;
+uniform float uBlueL,uExpo,uContrast,uCool;
+vec3 lin_(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),step(.04045,c));}
+vec3 srgb_(vec3 c){c=max(c,0.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
+vec3 lab_(vec3 c){vec3 l=lin_(c);vec3 x=vec3(dot(l,vec3(.4124,.3576,.1805))/.95047,dot(l,vec3(.2126,.7152,.0722)),dot(l,vec3(.0193,.1192,.9505))/1.08883);
+  vec3 f=mix(7.787*x+16./116.,pow(x,vec3(1./3.)),step(.008856,x));return vec3(116.*f.y-16.,500.*(f.x-f.y),200.*(f.y-f.z));}
+vec3 unlab_(vec3 L){float fy=(L.x+16.)/116.,fx=fy+L.y/500.,fz=fy-L.z/200.;vec3 f=vec3(fx,fy,fz);vec3 x=mix((f-16./116.)/7.787,f*f*f,step(.2069,f));
+  x*=vec3(.95047,1.,1.08883);vec3 l=vec3(dot(x,vec3(3.2406,-1.5372,-.4986)),dot(x,vec3(-.9689,1.8758,.0415)),dot(x,vec3(.0557,-.2040,1.0570)));return clamp(srgb_(l),0.,1.);}
+vec3 blues_(vec3 c,float k){vec3 L=lab_(c);float C=length(L.yz),h=mod(degrees(atan(L.z,L.y))+360.,360.);
+  float w=smoothstep(205.,222.,h)*(1.-smoothstep(298.,315.,h))*smoothstep(2.,6.,C);return unlab_(vec3(L.x+uBlueL*w*(100.-L.x)*.4,L.yz*mix(1.,k,w)));}   /* blue light lifts only the blues */
+vec3 grade_(vec3 c){c=(c-.5)*uContrast+.5;c*=uExpo;c=mix(c,c*vec3(.86,.97,1.14),uCool);return clamp(c,0.,1.);}
+void main(){vec2 q=gl_PointCoord*2.-1.;float d=length(q),a=atan(q.y,q.x);
+  float R=.5+.12*sin(a*5.+vSeed*40.)+.08*sin(a*9.-vSeed*23.)+.05*sin(a*17.+vSeed*7.);   /* an irregular blot */
+  float m=smoothstep(R,R-.12,d);
+  for(int i=0;i<6;i++){float fi=float(i),aa=vSeed*31.+fi*1.047+.4*sin(fi*7.+vSeed*13.),rr=.68+.22*fract(sin(fi*91.+vSeed*57.)*437.);   /* droplets */
+    vec2 c=vec2(cos(aa),sin(aa))*rr;float s=.05+.05*fract(sin(fi*13.+vSeed*3.)*91.);m=max(m,smoothstep(s,s-.03,length(q-c)));}
+  if(m<.02)discard;vec3 col=blues_(texture2D(uSheet,vUv).rgb,uChroma*1.15);
+  gl_FragColor=vec4(col,m*vA*.95);}`;
+function buildSplashes(){const W=D.W,H=D.H,s=1/1000,g=new THREE.BufferGeometry(),hm=new Float32Array(N*3),pg=new Float32Array(N*2),mk=new Float32Array(N),sd=new Float32Array(N),r=new Float32Array(N);
+  D.faces.forEach((f,i)=>{hm.set([D.hx[i],D.hy[i],0],i*3);pg.set([f[0],f[1]],i*2);mk[i]=D.mask[i];sd[i]=rnd(i+.77);r[i]=Math.sqrt(Math.max(4,f[3]))*s});
+  const nmA=new Float32Array(N);for(let i=0;i<N;i++)nmA[i]=NM?NM.f[i]:-1;
+  for(const [k,a,z] of [["position",hm,3],["aHome",hm,3],["aPg",pg,2],["aMask",mk,1],["aSeed",sd,1],["aR",r,1],["aName",nmA,1]])g.setAttribute(k,new THREE.BufferAttribute(a,z));
+  for(let m=0;m<K;m++){const u={uLayer:{value:m},uSelName:U.uSelName,uT:U.uT,uK:U.uK,uDir:U.uDir,uH:U.uH,uPage:U.uPage,uSheet:U.uSheet,uChroma:U.uChroma};
+    const pts=new THREE.Points(g,new THREE.ShaderMaterial({uniforms:u,vertexShader:SVS,fragmentShader:SFS,transparent:true,depthWrite:false}));pts.frustumCulled=false;pts.renderOrder=2;scene.add(pts);splashes.push(pts)}}
+let splashes=[];
+
+/* ---------- the traced contours: in the colour the thirteen photographs make together, whitening as they reach the sheet ---------- */
+const LVS=`attribute float aK,aSeed,aArc,aSide;attribute vec3 aC,aWind;
+uniform float uT,uTime,uZ0,uZS,uK,uSelLAll;uniform vec4 uSelL[4];varying vec3 vC;varying float vA,vE,vArc;
+void main(){float g=clamp(((uT-3.)-aK*.45)/.3,0.,1.);float e=g*g*(3.-2.*g);float fly=sin(3.14159*e);
+  float zk=uZ0-(1.-aK)*(uK-1.)*uZS;vec3 c=vec3(position.xy,mix(zk,0.,e)+.0055*e-(aSide<0.?.012*(1.-e):0.));   /* a copy just behind the photograph too, so the line runs through to its other side */
+  vec3 wd=vec3(aWind.x,-aWind.y,0.);float ws=aWind.z;float sway=sin(uTime*(.3+.55*ws)+aSeed*6.2832);
+  c+=wd*sway*(.003+.02*ws)*(1.-.7*e)+wd*fly*(.06+.22*ws);
+
+  float draw=clamp((uT-1.)*1.25-aK*.25,0.,1.);   /* the contours draw themselves on, photograph by photograph */
+  float lk=floor(aK*(uK-1.)+.5);vA=(uSelLAll<.5&&dot(uSelL[int(lk/4.)],vec4(equal(vec4(mod(lk,4.)),vec4(0.,1.,2.,3.))))<.5)?-1.:draw;vArc=aArc;vC=mix(aC*1.15,vec3(.96,.98,1.),e*.85);vE=e;gl_Position=projectionMatrix*modelViewMatrix*vec4(c,1.);}`;
+const LFS=`precision highp float;varying vec3 vC;varying float vA,vE,vArc;uniform float uLA;void main(){if(vA<=0.||vArc>vA)discard;gl_FragColor=vec4(min(vC,vec3(1.)),uLA);}`;
+function buildLines(L){const W=D.W,H=D.H,s=1/1000,sc=L.scale;let n=0;L.paths.forEach(p=>n+=(p.xy.length/2-1)*2);
+  n*=2;const pos=new Float32Array(n*3),aK=new Float32Array(n),aS=new Float32Array(n),aC=new Float32Array(n*3),aW=new Float32Array(n*3),aArc=new Float32Array(n),aSd=new Float32Array(n);let v=0;
+  L.paths.forEach((p,pi)=>{const m=p.xy.length/2,cum=[0];for(let j=1;j<m;j++)cum.push(cum[j-1]+Math.hypot(p.xy[2*j]-p.xy[2*j-2],p.xy[2*j+1]-p.xy[2*j-1]));const tot=cum[m-1]||1;
+    const put=j=>{const X=p.xy[2*j]/sc,Y=p.xy[2*j+1]/sc;pos[v*3]=(X-W/2)*s;pos[v*3+1]=-(Y-H/2)*s;aK[v]=p.k/(K-1);aS[v]=rnd(pi+.25);aArc[v]=cum[j]/tot;
+      const c=p.c[j];aC[v*3]=(c>>16&255)/255;aC[v*3+1]=(c>>8&255)/255;aC[v*3+2]=(c&255)/255;aW.set(windAt(X,Y),v*3);aSd[v]=side;v++};
+    let side=1;for(let j=0;j<m-1;j++){put(j);put(j+1)}side=-1;for(let j=0;j<m-1;j++){put(j);put(j+1)}});
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  for(const [k,a,sz] of [["aK",aK,1],["aSeed",aS,1],["aArc",aArc,1],["aSide",aSd,1],["aC",aC,3],["aWind",aW,3]])g.setAttribute(k,new THREE.BufferAttribute(a,sz));
+  const lm=new THREE.ShaderMaterial({uniforms:{uT:U.uT,uTime:U.uTime,uZ0:U.uZ0,uZS:U.uZS,uK:U.uK,uSelLAll:U.uSelLAll,uSelL:U.uSelL,uLA:{value:L.paths.length>800?.42:.95}},vertexShader:LVS,fragmentShader:LFS,transparent:true,depthWrite:false});
+  const ls=new THREE.LineSegments(g,lm);ls.frustumCulled=false;ls.renderOrder=1;scene.add(ls);D.lines=ls}
+
+/* ---------- steps, captions, play ---------- */
+const CAPS=[["Photographs","The {n} photographs Unsplash returned for “{w}”, one behind another, the first furthest away."],
+  ["Contours","Each photograph’s light cut into eight bands, its seven boundaries traced as lines. They are drawn in the colour the {n} photographs make together."],
+  ["Shards","Every crossing of every photograph’s lines cuts a face. Each photograph breaks along its lines into the shards it helped cut, pieces of that photograph; a shard cut by four photographs is in all four."],
+  ["Gathering","Photograph by photograph, the lines and the shards they cut travel forward through the photographs that came after. Where the copies of a shard meet, they become that piece of the ${LABEL} sheet: its named blue meeting the photographs in its own blend."],
+  ["Coming apart","Photograph by photograph, the lines lift off the sheet and travel back to the photograph they were cut from, each taking its copy of every shard it cut."]];
+function stageOf(){return Math.max(0,Math.min(3,Math.ceil(t-1e-3)-1))}   /* the step being shown, or just finished */
+const TOOLCAP={turn:"Drag to turn the sculpture, scroll to move in and out. Pick a tool to draw into it.",pen:"Draw freely. Each mark lies on a plane facing you, through the shard you start on. Shift-drag or right-drag still turns the sculpture.",
+  line:"Drag a straight line, on a plane facing you through the shard you start on.",dot:"Click to place a dot, on the shard under the pointer or in front of the sculpture.",connect:"Click one dot, then another, to join them. Joins follow their dots."};
+let lastCap="";function caption(){if(typeof diagMode!=="undefined"&&diagMode){const key="D"+tool;if(key!==lastCap){lastCap=key;$("#cap").innerHTML=`<b>Diagram · ${tool}</b>${TOOLCAP[tool]}`}return}const back=tGoal<t&&t>3;let k=back?4:stageOf();let [h,p]=CAPS[k];
+  if(t>=3.999&&!back){h=`The ${LABEL} sheet`;p=`As Diagramming Blue builds it, in ${fmt(N)} shards: each its named blue meeting the photographs in that name’s own blend, the traced lines in white over it.`}
+  p=p.replace(/\{n\}/g,NUMW[K]||K).replace(/\{w\}/g,LABEL);const key=h+p;if(key!==lastCap){lastCap=key;$("#cap").innerHTML=`<b>${h}</b>${p}`}
+  document.querySelectorAll(".stages [data-t]").forEach(b=>b.setAttribute("aria-pressed",String(Math.round(+b.dataset.t)===Math.ceil(t-1e-3)&&t>0)))}
+function setLoop(v){loopOn=v;$("#loop").setAttribute("aria-pressed",String(v))}
+$("#loop").onclick=()=>{setLoop(!loopOn);if(loopOn&&t>=3.999)tGoal=3;else if(loopOn)tGoal=4};
+document.querySelectorAll(".stages [data-t]").forEach(b=>b.onclick=()=>{setLoop(false);tGoal=+b.dataset.t});
+let phOn=true,shOn=true,layerOn=[];
+let sculptOn=true,diagOn=true;
+function applyVis(){const on=m=>sculptOn&&layerOn[m]!==false;photoPlanes.forEach((p,m)=>p.visible=phOn&&on(m));meshes.forEach((me,m)=>me.visible=shOn&&on(m));if(D&&D.lines)D.lines.visible=sculptOn&&$("#lnbtn").getAttribute("aria-pressed")==="true";placed.forEach(o=>o.visible=sculptOn);splashes.forEach((sp,m)=>sp.visible=on(m));
+  const f=new Float32Array(16);let all=true;for(let m=0;m<K;m++){f[m]=on(m)?1:0;if(!on(m))all=false}U.uSelLAll.value=all?1:0;U.uSelL.value.forEach((v,i)=>v.set(f[i*4],f[i*4+1],f[i*4+2],f[i*4+3]))}
+$("#lnbtn").onclick=()=>{const b=$("#lnbtn"),on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",String(on));applyVis()};
+$("#phbtn").onclick=()=>{phOn=!phOn;$("#phbtn").setAttribute("aria-pressed",String(phOn));applyVis()};
+$("#shbtn").onclick=()=>{shOn=!shOn;$("#shbtn").setAttribute("aria-pressed",String(shOn));applyVis();if(!shOn)showTip(-1)};
+let hoverOn=true;$("#hvbtn").setAttribute("aria-pressed","true");$("#hvbtn").onclick=()=>{hoverOn=!hoverOn;$("#hvbtn").setAttribute("aria-pressed",String(hoverOn));if(!hoverOn){hovId=-1;showTip(-1)}};
+/* select one photograph's layer, or one named blue */
+function fillSelects(){{const fs=$("#fillsel");const o=document.createElement("option");o.value=K;o.textContent="fill: the sheet";fs.append(o);
+    D.photos.forEach((p,m)=>{const q=document.createElement("option");q.value=m;q.textContent=`fill: ${m+1} · ${(p.alt||"untitled").slice(0,22)}`;fs.append(q)});fs.onchange=e=>drawFill=+e.target.value}
+
+  const LY=$("#lylist"),tA_=U.uAtlas.value.image,tc=document.createElement("canvas");tc.width=22*2;tc.height=28*2;const tx_=tc.getContext("2d");
+  D.photos.forEach((p,m)=>{let src="";try{tx_.drawImage(tA_,(m%4)*tA_.width/4,Math.floor(m/4)*tA_.height/4,tA_.width/4,tA_.height/4,0,0,tc.width,tc.height);src=tc.toDataURL("image/jpeg",.7)}catch(e){}
+    const lab=document.createElement("label");lab.innerHTML=`<input type="checkbox" checked data-m="${m}"><img alt="" src="${src}"><span>${m+1} · ${esc((p.alt||"untitled").slice(0,30))}</span><span class="n">${fmt(p.faces.length)}</span>`;LY.append(lab)});
+  LY.addEventListener("change",()=>{document.querySelectorAll("#lylist input").forEach(b=>layerOn[+b.dataset.m]=b.checked);applyVis()});
+  if(NM)NM.pal.forEach((q,k)=>{if(k<128){const c=new THREE.Color(q[1]);U.uPal.value[k].set(c.r,c.g,c.b)}});
+  if(NM){const cnt=new Map();NM.f.forEach(k=>{if(k>=0)cnt.set(k,(cnt.get(k)||0)+1)});const L_=$("#bllist");
+    [...cnt.entries()].sort((a,b)=>b[1]-a[1]).forEach(([k,n])=>{const lab=document.createElement("label");lab.innerHTML=`<input type="checkbox" data-k="${k}"><span class="sw" style="background:${NM.pal[k][1]}"></span><span>${esc(NM.pal[k][0])}</span><span class="n">${fmt(n)}</span>`;L_.append(lab)});
+    L_.addEventListener("change",syncBlues)}}
+/* the ticked blues: 128 flags, packed four to a vector */
+function syncBlues(){const boxes=[...document.querySelectorAll("#bllist input")],on=boxes.filter(b=>b.checked);U.uHide.value=$("#blhide").checked?1:0;
+  const f=new Float32Array(128);on.forEach(b=>{const k=+b.dataset.k;if(k<128)f[k]=1});U.uSel.value.forEach((v,i)=>v.set(f[i*4],f[i*4+1],f[i*4+2],f[i*4+3]));
+}
+$("#lyall").onclick=()=>{document.querySelectorAll("#lylist input").forEach(b=>{b.checked=true;layerOn[+b.dataset.m]=true});applyVis()};
+$("#lynone").onclick=()=>{document.querySelectorAll("#lylist input").forEach(b=>{b.checked=false;layerOn[+b.dataset.m]=false});applyVis()};
+$("#blall").onclick=()=>{document.querySelectorAll("#bllist input").forEach(b=>b.checked=true);syncBlues()};
+$("#blnone").onclick=()=>{document.querySelectorAll("#bllist input").forEach(b=>b.checked=false);syncBlues()};
+function panel(id,btn){const p_=$(id),v=p_.hidden;for(const [o,b] of [["#bl","#bluesbtn"],["#blp","#bluesbtn2"]]){$(o).hidden=true;$(b).setAttribute("aria-pressed","false")}p_.hidden=!v;$(btn).setAttribute("aria-pressed",String(v))}
+$("#bluesbtn").onclick=()=>panel("#bl","#bluesbtn");$("#bluesbtn2").onclick=()=>panel("#blp","#bluesbtn2");$("#blhide").onchange=syncBlues;
+$("#chroma").oninput=e=>{U.uChroma.value=+e.target.value;const q=document.querySelector('#lightp [data-u="uChroma"]');if(q)q.value=e.target.value};
+
+/* ---------- camera: drag to turn about the middle, scroll, pinch or In/Out to move ---------- */
+let th=.55,ph=.18,dist=3.6,dragging=null,idle=0;const centre=new THREE.Vector3();
+const cv=$("#gl");
+cv.addEventListener("contextmenu",e=>{if(diagMode)e.preventDefault()});
+const pan=new THREE.Vector3();let moveOn=false;   /* where the sculpture sits on screen: slid by move, alt-drag or middle-drag */
+cv.addEventListener("pointerdown",e=>{const panning=moveOn&&e.button===0||e.altKey||e.button===1;if(!panning&&drawOn&&e.button===0&&!e.shiftKey&&diagDown(e))return;cv.setPointerCapture(e.pointerId);
+  dragging={x:e.clientX,y:e.clientY,th,ph,pan:panning?pan.clone():null};cv.classList.add("drag");if(e.button===1)e.preventDefault()});
+cv.addEventListener("pointermove",e=>{mouse=rel(e);if(stroke){moveStroke(e);return}if(dragging&&dragging.pan){const k=dist*.0011,r=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0),u=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+    pan.copy(dragging.pan).addScaledVector(r,-(e.clientX-dragging.x)*k).addScaledVector(u,(e.clientY-dragging.y)*k);idle=performance.now();return}
+  if(dragging){th=dragging.th-(e.clientX-dragging.x)*.006;ph=Math.max(-1.3,Math.min(1.3,dragging.ph+(e.clientY-dragging.y)*.005));idle=performance.now()}});
+const up=()=>{if(stroke)endStroke();dragging=null;cv.classList.remove("drag")};cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+cv.addEventListener("pointerleave",()=>{mouse=null});
+let down=null;cv.addEventListener("pointerdown",e=>{down=drawOn?null:{x:e.clientX,y:e.clientY}});
+cv.addEventListener("pointerup",e=>{if(!down||drawOn)return;const moved=Math.hypot(e.clientX-down.x,e.clientY-down.y);down=null;if(moved>5||!NM||!shOn||!sculptOn||U.uShard.value<=0)return;
+  const keep=mouse;mouse=rel(e);const pid=pick();mouse=keep;if(pid>=0)placeName(pid%N)});
+const DMIN=.15,DMAX=9;const zoom=f=>{dist=Math.max(DMIN,Math.min(DMAX,dist*f));idle=performance.now()};
+cv.addEventListener("wheel",e=>{e.preventDefault();zoom(Math.exp(e.deltaY*(e.ctrlKey?.01:.0015)))},{passive:false});
+const touches=new Map();let pinch0=null;
+cv.addEventListener("pointerdown",e=>{touches.set(e.pointerId,{x:e.clientX,y:e.clientY});if(touches.size===2){const [a,b]=[...touches.values()];pinch0={d:Math.hypot(a.x-b.x,a.y-b.y),dist};dragging=null}});
+cv.addEventListener("pointermove",e=>{if(!touches.has(e.pointerId))return;touches.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pinch0&&touches.size===2){const [a,b]=[...touches.values()],d=Math.hypot(a.x-b.x,a.y-b.y);dist=Math.max(DMIN,Math.min(DMAX,pinch0.dist*pinch0.d/Math.max(1,d)))}});
+const unt=e=>{touches.delete(e.pointerId);if(touches.size<2)pinch0=null};cv.addEventListener("pointerup",unt);cv.addEventListener("pointercancel",unt);
+addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea"))return;if(e.key==="+"||e.key==="="||e.key==="ArrowUp")zoom(.85);if(e.key==="-"||e.key==="_"||e.key==="ArrowDown")zoom(1/.85)});
+let zHold=0;const holdZoom=f=>{const step=()=>{zoom(f);zHold=requestAnimationFrame(step)};step()};
+for(const [id,f] of [["#zin",.975],["#zout",1/.975]]){const b=document.querySelector(id);b.addEventListener("pointerdown",()=>holdZoom(f));for(const ev of ["pointerup","pointerleave","pointercancel"])b.addEventListener(ev,()=>cancelAnimationFrame(zHold))}
+let fitted=false;function resize(){const rb=$("#gl").getBoundingClientRect(),w=Math.max(1,rb.width),h=Math.max(1,rb.height);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();U.uH.value=h*renderer.getPixelRatio()/2;
+  if(!fitted){dist=3.6*Math.max(1,1.3/camera.aspect);fitted=true}}   /* start far enough back for a narrow window */
+addEventListener("resize",resize);try{new ResizeObserver(()=>resize()).observe($("#glbox"))}catch(e){}
+const rel=e=>{const r=$("#gl").getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+/* the caption and the diagrams panel sit just above the one menu, however many rows it wraps to */
+{const st=document.querySelector(".stages"),fit=()=>{const h=st.offsetHeight+28;$("#cap").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`;$("#dg").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`;$("#bl").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`;$("#gifp").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`;$("#lightp").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`;$("#blp").style.bottom=`calc(${h}px + env(safe-area-inset-bottom,0px))`};
+ try{new ResizeObserver(fit).observe(st)}catch(e){addEventListener("resize",fit)}fit()}
+
+/* ---------- hover: the shard under the pointer, read back from an id render ---------- */
+let mouse=null,hovId=-1;const pickRT=new THREE.WebGLRenderTarget(1,1),px=new Uint8Array(4);
+function pick(){if(!mouse||dragging)return -1;const dpr=renderer.getPixelRatio(),w=renderer.domElement.width,h=renderer.domElement.height;
+  camera.setViewOffset(w,h,Math.round(mouse.x*dpr),Math.round(mouse.y*dpr),1,1);renderer.setRenderTarget(pickRT);renderer.setClearColor(0,1);renderer.clear();renderer.render(pickScene,camera);
+  renderer.readRenderTargetPixels(pickRT,0,0,1,1,px);renderer.setRenderTarget(null);renderer.setClearColor(roomCol,1);camera.clearViewOffset();
+  const id=px[0]+px[1]*256+px[2]*65536-1;return id>=0&&id<N*K?id:-1}
+function inkOn(c){const lin=v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);return .2126*lin(c[0])+.7152*lin(c[1])+.0722*lin(c[2])>.3?"#0b1530":"#fff"}
+const tipCv=document.createElement("canvas"),tipX=tipCv.getContext("2d",{willReadFrequently:true});let sheetPx=null,atlasPx=null;
+function pxOf(img,u,v){if(!img)return[.3,.5,.8];if(!img.__d){tipCv.width=img.width;tipCv.height=img.height;tipX.drawImage(img,0,0);img.__d=tipX.getImageData(0,0,img.width,img.height)}
+  const d=img.__d,x=Math.max(0,Math.min(d.width-1,Math.round(u*d.width))),y=Math.max(0,Math.min(d.height-1,Math.round((1-v)*d.height))),i=(y*d.width+x)*4;return[d.data[i]/255,d.data[i+1]/255,d.data[i+2]/255]}
+function showTip(pid){const tip=$("#tip");if(pid<0){tip.hidden=true;return}
+  const id=pid%N,m=Math.floor(pid/N),f=D.faces[id],e=ease(gOf(m)),cut=D.cutters[id];
+  const us=f[0]/D.W,vs=1-f[1]/D.H,[fx0,fy0,fx1,fy1]=D.frame,fu=(f[0]-fx0)/(fx1-fx0),fv=(f[1]-fy0)/(fy1-fy0);
+  const a=pxOf(U.uAtlas.value.image,((m%4)+fu)/4,1-(Math.floor(m/4)+fv)/4),b=pxOf(U.uSheet.value.image,us,vs),c=a.map((x,j)=>x*(1-e)+b[j]*e);
+  const hx="#"+c.map(x=>Math.round(x*255).toString(16).padStart(2,"0")).join("");
+  tip.style.setProperty("--b",hx);tip.style.setProperty("--on",inkOn(c));
+  /* the poem: on its photograph, that photograph's caption; in the sheet, the captions of every photograph that cut it */
+  const lines_=e<.5?[D.photos[m].alt||"untitled"]:cut.map(k=>D.photos[k].alt||"untitled");
+  tip.innerHTML=`<p class="poem" style="font-size:${e<.5?32:20}px">${lines_.map(l=>`<span>${esc(l)}</span>`).join("")}</p><div class="meta">${e<.5?`a piece of photograph ${m+1} of ${K} · ${esc(D.photos[m].by||"")}`:`a piece of the ${LABEL} sheet`}<br>cut by ${cut.length} of ${K} photographs: ${cut.map(k=>k+1).join(", ")}</div>`;
+  tip.hidden=false}
+function placeTip(){return;const tw=tip.offsetWidth,th_=tip.offsetHeight;let x=mouse.x+20,y=mouse.y+20;
+  if(x+tw>innerWidth-8)x=mouse.x-tw-20;if(y+th_>innerHeight-8)y=mouse.y-th_-20;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,y)+"px"}
+
+/* ---------- names placed in the dark behind the sculpture ---------- */
+const placed=[];
+function nameTexture(nm,hx,sys){const c=document.createElement("canvas"),x=c.getContext("2d"),F1='italic 400 64px "EB Garamond",Georgia,serif',F2='500 22px "IBM Plex Mono",ui-monospace,monospace';
+  x.font=F1;const w1=x.measureText(nm).width;x.font=F2;const w2=x.measureText(sys).width;c.width=Math.ceil(Math.max(w1,w2)+60);c.height=130;
+  x.font=F1;x.textAlign="center";x.textBaseline="alphabetic";x.shadowColor="rgba(170,200,255,.45)";x.shadowBlur=18;x.fillStyle=hx;x.fillText(nm,c.width/2,72);x.shadowBlur=0;x.fillText(nm,c.width/2,72);
+  x.font=F2;x.fillStyle="rgba(141,154,176,.9)";x.fillText(sys,c.width/2,112);const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;return{t,a:c.width/c.height}}
+function placeName(i){const k=NM.f[i];if(k<0)return;const [nm,hx,sys]=NM.pal[k],{t:tx,a}=nameTexture(nm,hx,sys);setColour(hx);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,opacity:0,depthWrite:false}));const h=.085;sp.scale.set(h*a,h,1);
+  /* behind the furthest photograph, opened out from where the shard sits, so the names gather in the dark around the sculpture */
+  const n=placed.length,ang=rnd(n+3)*Math.PI*2,j=.12+.25*rnd(n+9);
+  sp.position.set(D.hx[i]*1.7+Math.cos(ang)*j,D.hy[i]*1.35+Math.sin(ang)*j,ZK(0)-.7-.4*rnd(n+5));sp.renderOrder=-2;scene.add(sp);placed.push(sp);$("#clearnames").hidden=false}
+$("#clearnames").onclick=()=>{placed.splice(0).forEach(o=>{scene.remove(o);o.material.map.dispose();o.material.dispose()});$("#clearnames").hidden=true};
+function placeNames(){for(const o of placed)if(o.material.opacity<1)o.material.opacity=Math.min(1,o.material.opacity+.02)}
+
+/* ---------- a very large image of this view, rendered off screen at up to 7,200 pixels on its long side ---------- */
+let dls=null;
+$("#saveimg").onclick=async()=>{const b=$("#saveimg");if(!meshes.length)return;b.disabled=true;b.textContent="rendering…";
+  try{const gl=renderer.getContext(),lim=Math.min(7200,gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)),f=lim/Math.max($("#gl").clientWidth,$("#gl").clientHeight);
+    const w=Math.round($("#gl").clientWidth*f),h=Math.round($("#gl").clientHeight*f),rt=new THREE.WebGLRenderTarget(w,h),h0=U.uH.value;U.uH.value=h/2;
+    renderer.setRenderTarget(rt);renderer.setClearColor(roomCol,1);renderer.clear();renderer.render(scene,camera);const px_=new Uint8Array(w*h*4);renderer.readRenderTargetPixels(rt,0,0,w,h,px_);renderer.setRenderTarget(null);rt.dispose();U.uH.value=h0;
+    const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d"),im=x.createImageData(w,h),row=w*4;
+    for(let y=0;y<h;y++)im.data.set(px_.subarray((h-1-y)*row,(h-y)*row),y*row);x.putImageData(im,0,0);
+    b.textContent="saving…";const blob=await new Promise(r=>c.toBlob(r,"image/png"));
+    const word=(document.querySelector(".eyebrow").textContent.split("·")[1]||"sculpture").trim().replace(/\s+/g,"-");
+    const fn=`${new Date().toISOString().slice(0,10)}-${word}-diagramming-blue-${w}x${h}.png`;
+    await saveBlob(blob,fn);
+    b.textContent="save image"}
+  catch(e){b.textContent=e&&e.code==="declined"?"save image":"could not save";setTimeout(()=>b.textContent="save image",2500)}finally{b.disabled=false}};
+
+/* ---------- a looping GIF of the sculpture: frames read straight from the canvas, 12 a second, each with its own 256 colours ---------- */
+const GIFENC="https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js";let rec=null,gifLib=null;
+async function saveBlob(blob,fn){if(dls)await dls.save({filename:fn,data:blob});else{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fn;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}}
+/* the light panel: each slider drives one shared uniform; room darkens or blues the space itself */
+const ROOM0=new THREE.Color(0x05080f),ROOM1=new THREE.Color(0x0c2248);
+function setRoom(v){roomCol.copy(ROOM0).lerp(ROOM1,v);renderer.setClearColor(roomCol,1)}
+document.querySelectorAll("#lightp [data-u]").forEach(i=>i.oninput=()=>{U[i.dataset.u].value=+i.value;if(i.dataset.u==="uChroma")$("#chroma").value=i.value});
+$("#room").oninput=e=>setRoom(+e.target.value);
+$("#lightreset").onclick=()=>{document.querySelectorAll("#lightp input[type=range]").forEach(i=>{i.value=i.defaultValue;i.dispatchEvent(new Event("input"))})};
+$("#lightbtn").onclick=()=>{const p_=$("#lightp"),v=p_.hidden;p_.hidden=!v;$("#lightbtn").setAttribute("aria-pressed",String(v));if(v){$("#gifp").hidden=true;$("#gifbtn").setAttribute("aria-pressed","false")}};
+$("#gifbtn").onclick=()=>{$("#lightp").hidden=true;$("#lightbtn").setAttribute("aria-pressed","false");const p_=$("#gifp"),v=p_.hidden;p_.hidden=!v;$("#gifbtn").setAttribute("aria-pressed",String(v))};
+$("#gifgo").onclick=async()=>{if(rec)return;const st=$("#gifst");st.textContent="loading…";
+  try{gifLib=gifLib||await import(GIFENC)}catch(e){st.textContent="the GIF encoder did not load";return}
+  const w=+$("#gifw").value,h=Math.round(w*$("#gl").clientHeight/$("#gl").clientWidth/2)*2,c=document.createElement("canvas");c.width=w;c.height=h;
+  rec={enc:gifLib.GIFEncoder(),ctx:c.getContext("2d",{willReadFrequently:true}),w,h,n:0,need:Math.round(+$("#giflen").value*12),last:0,turn:$("#gifmo").value==="turn",th0:th};
+  $("#gifgo").disabled=true};
+function gifFrame(now){if(now-rec.last<80)return;rec.last=now;const {ctx,w,h}=rec;ctx.drawImage(renderer.domElement,0,0,w,h);
+  const d=ctx.getImageData(0,0,w,h).data,pal=gifLib.quantize(d,256),ix=gifLib.applyPalette(d,pal);rec.enc.writeFrame(ix,w,h,{palette:pal,delay:83});rec.n++;
+  $("#gifst").textContent=`recording ${rec.n} / ${rec.need}`;
+  if(rec.n>=rec.need){const r=rec;rec=null;r.enc.finish();const blob=new Blob([r.enc.bytes()],{type:"image/gif"});$("#gifst").textContent=`saving ${(blob.size/1048576).toFixed(1)} MB…`;
+    saveBlob(blob,`${new Date().toISOString().slice(0,10)}-${WORD}-diagramming-blue.gif`).then(()=>$("#gifst").textContent="saved").catch(e=>$("#gifst").textContent=e&&e.code==="declined"?"":"could not save").finally(()=>$("#gifgo").disabled=false)}}
+
+/* ---------- loop ---------- */
+let frame=0,lift=0,last=0;
+function loop(now){const dt=Math.min(.1,(now-(last||now))/1000);last=now;
+  U.uTime.value=RM?0:now/1000;
+  if(RM)t=tGoal;else if(t!==tGoal){const sp=SPEED[Math.min(3,Math.floor(Math.min(t,tGoal)+1e-6))]||.2;const d=Math.sign(tGoal-t)*sp*dt;t=Math.abs(tGoal-t)<=Math.abs(d)?tGoal:t+d}
+  else if(loopOn){hold+=dt;if(hold>7){hold=0;tGoal=t>=3.999?3:4}}
+  if(t!==tGoal)hold=0;
+  if(t!==U.uT.value)U.uDir.value=t>U.uT.value?1:-1;U.uT.value=t;U.uShard.value=Math.max(0,Math.min(1,t-2));
+  /* the photographs appear one by one, dim as they break, and fade as their shards leave */
+  photoPlanes.forEach((p,m)=>{const on=Math.max(0,Math.min(1,t*K*.9-m*.9)),br=Math.max(0,Math.min(1,t-2)),gm=ease(gOf(m));p.material.uniforms.uOp.value=.95*on*(1-.65*br)*(1-gm)});
+  if(rec&&rec.turn){th=rec.th0+Math.PI*2*rec.n/rec.need;idle=now}
+  if(!dragging&&!RM&&now-idle>3000){const ta=.42+.38*Math.sin(now*.00011);th+=(ta-th)*.004}   /* a slow sway, never edge-on for long */
+  {const g=Math.max(0,Math.min(1,t-3)),zc=ZK(0)/2*(1-g);centre.z+=(zc-centre.z)*.06;
+   const tg=centre.clone().add(pan);camera.position.set(tg.x+dist*Math.sin(th)*Math.cos(ph),tg.y+dist*Math.sin(ph),tg.z+dist*Math.cos(th)*Math.cos(ph));camera.lookAt(tg)}
+  if(frame++%3===0&&hoverOn&&meshes.length&&U.uShard.value>0&&shOn&&sculptOn){const id=pick();if(id!==hovId){hovId=id;if(id>=0)U.uHover.value=id;showTip(id);lift=id>=0?0:lift}}
+  else if(U.uShard.value<=0&&hovId>=0){hovId=-1;showTip(-1)}
+  lift+=((hovId>=0?1:0)-lift)*.12;U.uLift.value=lift;if(hovId<0&&lift<.01)U.uHover.value=-1;
+  placeTip();caption();placeNames();
+  dgObjs.forEach(o=>{o.mesh.material.uniforms.uOp.value=o.data.opacity??1});
+  renderer.render(scene,camera);if(rec)gifFrame(now);requestAnimationFrame(loop)}
+
+/* ---------- diagramming in the space: marks laid on a plane facing you, through the shard you start on ---------- */
+let diagMode=false,tool="turn",drawOn=false,stroke=null,marks=[],linkFrom=null,drawFill=-1;
+let drawHex="#ffffff",drawW=1,drawSt="solid",drawAr=0;
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();
+function ndcOf(e){const r=$("#gl").getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1)}
+function homeOf(pid){const id=pid%N,m=Math.floor(pid/N),e=ease(gOf(m));return new THREE.Vector3(D.hx[id],D.hy[id],ZK(m)*(1-e))}
+function onPlane(e,plane){ndcOf(e);ray.setFromCamera(ndc,camera);const p=new THREE.Vector3();return ray.ray.intersectPlane(plane,p)?p:null}
+/* where a mark lies: through the shard under the pointer, else just in front of the nearest photograph under it, else the middle */
+function planeAt(e){const n=new THREE.Vector3();camera.getWorldDirection(n);const id=sculptOn&&shOn?pick():-1;let at=null;
+  if(id>=0)at=homeOf(id);else{ndcOf(e);ray.setFromCamera(ndc,camera);
+    const vis=photoPlanes.filter(p=>p.visible&&p.material.uniforms.uOp.value>.05),h=ray.intersectObjects(vis,false);if(h.length)at=h[0].point.clone().addScaledVector(n,-.008)}
+  return new THREE.Plane().setFromNormalAndCoplanarPoint(n,at||centre.clone())}
+const RAD=[0,.0018,.004,.008];
+function v3(pts){const V=[];for(let i=0;i+2<pts.length;i+=3)V.push(new THREE.Vector3(pts[i],pts[i+1],pts[i+2]));return V}
+/* split a polyline into the runs a dash pattern keeps */
+function dashRuns(V,on,off){const runs=[];let cur=[V[0]],acc=0,draw=true;
+  for(let i=1;i<V.length;i++){let a=V[i-1],b=V[i],L=a.distanceTo(b),t0=0;
+    while(L-t0>1e-9){const left=(draw?on:off)-acc,step=Math.min(left,L-t0),p=a.clone().lerp(b,(t0+step)/L);if(draw)cur.push(p);acc+=step;t0+=step;
+      if(acc>=(draw?on:off)-1e-9){if(draw){if(cur.length>1)runs.push(cur);cur=[]}else cur=[p];draw=!draw;acc=0}}}
+  if(draw&&cur.length>1)runs.push(cur);return runs}
+function tube(V,r,mat){const curve=V.length>2?new THREE.CatmullRomCurve3(V,false,"centripetal"):new THREE.LineCurve3(V[0],V[1]);
+  return new THREE.Mesh(new THREE.TubeGeometry(curve,Math.min(600,Math.max(2,V.length*3)),r,6,false),mat)}
+function arrowHead(at,dir,r,mat){const h=r*7+.018,c=new THREE.Mesh(new THREE.ConeGeometry(r*3+.006,h,12),mat);c.position.copy(at).addScaledVector(dir,-h/2);c.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);return c}
+function pathObj(V,d){const g=new THREE.Group(),col=new THREE.Color(d.col||"#ffffff"),w=d.w??0,st=d.st||"solid",r=RAD[w];
+  const mat=new THREE.MeshBasicMaterial({color:col});
+  if(w===0){const geo=new THREE.BufferGeometry().setFromPoints(V);const lm=st==="solid"?new THREE.LineBasicMaterial({color:col}):new THREE.LineDashedMaterial({color:col,dashSize:st==="dashed"?.018:.003,gapSize:st==="dashed"?.012:.008});
+    const l=new THREE.Line(geo,lm);if(st!=="solid")l.computeLineDistances();g.add(l)}
+  else if(st==="solid")g.add(tube(V,r,mat));
+  else if(st==="dashed")dashRuns(V,r*9+.012,r*6+.009).forEach(run=>g.add(tube(run,r,mat)));
+  else{const sp=new THREE.SphereGeometry(r*1.25,10,8),step=r*4+.007;let acc=0;{const m0=new THREE.Mesh(sp,mat);m0.position.copy(V[0]);g.add(m0)}
+    for(let i=1;i<V.length;i++){const a=V[i-1],b=V[i],L=a.distanceTo(b);let t=step-acc;while(t<=L){const m=new THREE.Mesh(sp,mat);m.position.copy(a).lerp(b,t/L);g.add(m);t+=step}acc=(acc+L)%step}}
+  const ar=d.ar||0,rr=Math.max(r,.0012);
+  if(ar>=1&&V.length>1){const n=V.length,dir=V[n-1].clone().sub(V[Math.max(0,n-4)]).normalize();g.add(arrowHead(V[n-1],dir,rr,mat))}
+  if(ar>=2&&V.length>1){const dir=V[0].clone().sub(V[Math.min(V.length-1,3)]).normalize();g.add(arrowHead(V[0],dir,rr,mat))}
+  return g}
+const nodeAt=nid=>{const m=marks.find(x=>x.d.kind==="node"&&x.d.nid===nid);return m?v3(m.d.pts)[0]:null};
+function buildMark(d){const kind=d.kind||"stroke";let g;
+  if(kind==="node"){g=new THREE.Group();const r=[.006,.009,.013,.02][d.w??1],s_=new THREE.Mesh(new THREE.SphereGeometry(r,18,14),new THREE.MeshBasicMaterial({color:new THREE.Color(d.col||"#fff")}));
+    s_.position.copy(v3(d.pts)[0]);s_.userData.nid=d.nid;g.add(s_);
+    const ring=new THREE.Mesh(new THREE.SphereGeometry(r*1.35,18,14),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.18,depthWrite:false}));ring.position.copy(s_.position);g.add(ring)}
+  else if(kind==="link"){const a=nodeAt(d.a),b=nodeAt(d.b);if(!a||!b)return null;g=pathObj([a,b],d)}
+  else{const V=v3(d.pts);if(V.length<2)return null;g=pathObj(V,d);if(Number.isInteger(d.fill)&&d.fill>=0)addFill(g,d.pts,d.fill)}
+  g.renderOrder=3;g.traverse(o=>{o.frustumCulled=false;o.renderOrder=3;if(o.material){o.material.transparent=true;o.material.depthTest=false;o.material.depthWrite=false}});return g}   /* marks always show, over the photographs and shards */
+/* every mark is rebuilt from the list whenever it changes: links follow their dots */
+function renderMarks(){marks.forEach(m=>{if(m.obj){scene.remove(m.obj);m.obj.traverse(o=>{if(o.geometry)o.geometry.dispose()})}m.obj=null});
+  marks.sort((x,y)=>(x.d.added||0)-(y.d.added||0));for(const k of ["node","stroke","link"])marks.forEach(m=>{if((m.d.kind||"stroke")===k){m.obj=buildMark(m.d);if(m.obj){m.obj.visible=diagOn;scene.add(m.obj)}}});strokeNote()}
+async function saveMark(d){d.added=Date.now();d.word=WORD;
+  if(!(canEdit&&db)){marks.push({id:"local-"+d.added+"-"+Math.random().toString(36).slice(2,6),d,local:true});saveLocal();renderMarks();return}
+  let ref=null;try{ref=db.collection("strokes").doc()}catch(e){}
+  const keepLocal=err=>{const m=marks.find(x=>ref&&x.id===ref.id);if(m){m.id="local-"+d.added;m.local=true;delete m.pending}else marks.push({id:"local-"+d.added,d,local:true});
+    saveLocal();renderMarks();const h=document.querySelector(".hint");if(h)h.textContent="Your mark is kept in this browser only: the page could not save it ("+((err&&(err.code||err.message))||"no database")+").";window.__diag&&window.__diag("stroke save failed: "+(err&&(err.code||err.message)))};
+  if(!ref){keepLocal(null);return}
+  marks.push({id:ref.id,d,pending:true,own:true});renderMarks();try{await ref.set(d);const m=marks.find(x=>x.id===ref.id);if(m)delete m.pending}catch(e){keepLocal(e)}}
+async function removeMark(m){if(m.local){marks=marks.filter(x=>x!==m);saveLocal();renderMarks();return}try{await db.collection("strokes").doc(m.id).delete();marks=marks.filter(x=>x!==m);renderMarks()}catch(e){}}
+const r4=p=>[+p.x.toFixed(4),+p.y.toFixed(4),+p.z.toFixed(4)];
+function preview(V){if(stroke.obj)scene.remove(stroke.obj);stroke.obj=new THREE.Line(new THREE.BufferGeometry().setFromPoints(V),new THREE.LineBasicMaterial({color:new THREE.Color(drawHex),depthTest:false,transparent:true}));stroke.obj.renderOrder=4;stroke.obj.frustumCulled=false;scene.add(stroke.obj)}
+function startStroke(e){const plane=planeAt(e),p=onPlane(e,plane);if(!p)return;cv.setPointerCapture(e.pointerId);stroke={plane,pts:[p],obj:null,straight:tool==="line"};preview([p,p])}
+function moveStroke(e){const p=onPlane(e,stroke.plane);if(!p)return;if(stroke.straight){stroke.pts[1]=p;preview(stroke.pts)}else{const last=stroke.pts[stroke.pts.length-1];if(p.distanceTo(last)<.005)return;stroke.pts.push(p);preview(stroke.pts)}}
+function endStroke(){const s_=stroke;stroke=null;if(s_&&s_.obj)scene.remove(s_.obj);if(!s_||s_.pts.length<2)return;
+  const pts=[];s_.pts.forEach(p=>pts.push(...r4(p)));saveMark({kind:"stroke",pts,col:drawHex,w:drawW,st:drawSt,ar:drawAr,fill:s_.straight?-1:drawFill})}
+function nodeUnder(e){ndcOf(e);ray.setFromCamera(ndc,camera);const hits=[];
+  marks.forEach(m=>{if(m.obj&&m.d.kind==="node")hits.push(m.obj.children[0])});const h=ray.intersectObjects(hits,false);if(h.length)return h[0].object.userData.nid;
+  /* forgiving: the nearest dot within 14 px on screen */
+  let best=null,bd=14*14;for(const m of marks){if(m.d.kind!=="node")continue;const v=v3(m.d.pts)[0].project(camera),x=(v.x+1)/2*$("#gl").clientWidth,y=(1-v.y)/2*$("#gl").clientHeight,q_=rel(e),dd=(x-q_.x)**2+(y-q_.y)**2;if(dd<bd){bd=dd;best=m.d.nid}}return best}
+let linkGlow=null;
+function diagDown(e){
+  if(tool==="pen"||tool==="line"){startStroke(e);return true}
+  if(tool==="dot"){const p=onPlane(e,planeAt(e));if(p)saveMark({kind:"node",nid:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),pts:r4(p),col:drawHex,w:drawW});return true}
+  if(tool==="connect"){const nid=nodeUnder(e);if(!nid){linkFrom=null;if(linkGlow){scene.remove(linkGlow);linkGlow=null}return true}
+    if(!linkFrom){linkFrom=nid;const p=nodeAt(nid);linkGlow=new THREE.Mesh(new THREE.SphereGeometry(.03,18,14),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.35,depthWrite:false}));linkGlow.position.copy(p);scene.add(linkGlow);return true}
+    if(nid!==linkFrom)saveMark({kind:"link",a:linkFrom,b:nid,col:drawHex,w:drawW,st:drawSt,ar:drawAr});linkFrom=null;if(linkGlow){scene.remove(linkGlow);linkGlow=null}return true}
+  return false}
+/* a drawn shape filled with an image: closed up, flattened onto its own plane, and shown as a window onto
+   that photograph (or the sheet) at exactly the place it covers */
+function addFill(line,pts,fill){if(pts.length<9)return;const P=[];for(let i=0;i+2<pts.length;i+=3)P.push(new THREE.Vector3(pts[i],pts[i+1],pts[i+2]));
+  const o=P[0],n=new THREE.Vector3();for(let i=1;i+1<P.length;i++)n.add(new THREE.Vector3().subVectors(P[i],o).cross(new THREE.Vector3().subVectors(P[i+1],o)));
+  if(n.lengthSq()<1e-12)n.set(0,0,1);n.normalize();const u=new THREE.Vector3(1,0,0);if(Math.abs(n.dot(u))>.9)u.set(0,1,0);u.sub(n.clone().multiplyScalar(n.dot(u))).normalize();const w=new THREE.Vector3().crossVectors(n,u);
+  const flat=P.map(p=>{const d=new THREE.Vector3().subVectors(p,o);return new THREE.Vector2(d.dot(u),d.dot(w))});let tr=[];try{tr=THREE.ShapeUtils.triangulateShape(flat,[])}catch(e){}if(!tr.length)return;
+  const W=D.W,H=D.H,[fx0,fy0,fx1,fy1]=D.frame,K_=K,pos=new Float32Array(P.length*3),uv=new Float32Array(P.length*2);
+  P.forEach((p,i)=>{pos.set([p.x,p.y,p.z],i*3);const X=p.x*1000+W/2,Y=-p.y*1000+H/2;
+    if(fill>=K_){uv.set([X/W,1-Y/H],i*2)}else{const fu=Math.max(0,Math.min(1,(X-fx0)/(fx1-fx0))),fv=Math.max(0,Math.min(1,(Y-fy0)/(fy1-fy0)));uv.set([((fill%4)+fu)/4,1-(Math.floor(fill/4)+fv)/4],i*2)}});
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("uv",new THREE.BufferAttribute(uv,2));g.setIndex(tr.flat());
+  const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:fill>=K_?U.uSheet.value:U.uAtlas.value,side:THREE.DoubleSide,transparent:true,opacity:.96,depthWrite:false}));m.renderOrder=2;line.add(m)}
+
+/* a visitor's own marks live only in their browser */
+const LKEY="blue-sculpture-lines:"+WORD;
+function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify(marks.filter(m=>m.local).map(m=>m.d)))}catch(e){}}
+function loadLocal(){try{JSON.parse(localStorage.getItem(LKEY)||"[]").forEach((d,i)=>{if(d&&(Array.isArray(d.pts)||d.kind==="link"))marks.push({id:"local-"+i,d,local:true})})}catch(e){}renderMarks()}
+function strokeNote(){const el=$("#strokes");if(!el)return;el.hidden=false;const n=marks.length;el.querySelector("span").textContent=n?`${n} mark${n>1?"s":""} in the space`:"No marks yet"}
+function mine(){return marks.filter(m=>m.local||(canEdit&&!m.local))}
+async function undoMark(){const own=mine().sort((x,y)=>(x.d.added||0)-(y.d.added||0)),m=own[own.length-1];if(!m)return;
+  if(m.d.kind==="node")for(const l of marks.filter(x=>x.d.kind==="link"&&(x.d.a===m.d.nid||x.d.b===m.d.nid)))await removeMark(l);await removeMark(m)}
+async function clearMarks(b){if(!b.dataset.sure){b.dataset.sure=1;const t=b.textContent;b.textContent="clear all?";setTimeout(()=>{delete b.dataset.sure;b.textContent=t},4000);return}
+  for(const m of [...mine()])await removeMark(m);delete b.dataset.sure}
+$("#undo").onclick=undoMark;$("#undo2").onclick=undoMark;$("#clear").onclick=e=>clearMarks(e.target);$("#clear2").onclick=e=>clearMarks(e.target);
+/* the two menus */
+function setMode(d){diagMode=d;$("#mS").setAttribute("aria-pressed",String(!d));$("#mD").setAttribute("aria-pressed",String(d));$("#grpS").hidden=d;$("#grpD").hidden=!d;
+  if(d){setLoop(false);tGoal=t;setTool(tool)}   /* the sculpture holds still where it is while you draw */else{drawOn=false;linkFrom=null;if(linkGlow){scene.remove(linkGlow);linkGlow=null}}caption(true)}
+function setTool(t){tool=t;drawOn=diagMode&&t!=="turn";document.querySelectorAll("#grpD .tool").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===t)));cv.style.cursor=drawOn?"crosshair":"";caption(true)}
+$("#movebtn").onclick=()=>{moveOn=!moveOn;$("#movebtn").setAttribute("aria-pressed",String(moveOn));cv.style.cursor=moveOn?"move":(drawOn?"crosshair":"")};
+$("#recentre").onclick=()=>pan.set(0,0,0);
+$("#mS").onclick=()=>setMode(false);$("#mD").onclick=()=>setMode(true);
+function diagVis(){marks.forEach(m=>{if(m.obj)m.obj.visible=diagOn});dgObjs.forEach(o=>{if(o.mesh)o.mesh.visible=diagOn&&!({...DEF,...o.data}).etch})}
+$("#vS").onclick=()=>{sculptOn=!sculptOn;$("#vS").setAttribute("aria-pressed",String(sculptOn));$("#vS").textContent=sculptOn?"on":"off";applyVis();if(!sculptOn)showTip(-1)};
+$("#vD").onclick=()=>{diagOn=!diagOn;$("#vD").setAttribute("aria-pressed",String(diagOn));$("#vD").textContent=diagOn?"on":"off";diagVis()};
+document.querySelectorAll("#grpD .tool").forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+const pickOne=(sel,attr,set)=>document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{document.querySelectorAll(sel).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));set(b.dataset[attr])});
+pickOne("#grpD .wd","w",v=>drawW=+v);pickOne("#grpD .st","st",v=>drawSt=v);pickOne("#grpD .ar","ar",v=>drawAr=+v);
+function setColour(hx){drawHex=hx;document.querySelectorAll("#swatches button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.hex===hx)))}
+function fillSwatches(){const box=$("#swatches");const add=(hx,name)=>{const b=document.createElement("button");b.dataset.hex=hx;b.style.background=hx;b.title=name;b.setAttribute("aria-label",name);b.setAttribute("aria-pressed","false");b.onclick=()=>setColour(hx);box.append(b)};
+  add("#ffffff","white");if(NM){const cnt=new Map();NM.f.forEach(k=>{if(k>=0)cnt.set(k,(cnt.get(k)||0)+1)});[...cnt.entries()].sort((a,b)=>b[1]-a[1]).slice(0,17).forEach(([k])=>add(NM.pal[k][1],NM.pal[k][0]))}setColour("#ffffff")}
+
+/* ---------- diagrams entered into the space (kept in the artifact's database; files in its asset store) ---------- */
+let db=null,assets=null,canEdit=false,dgObjs=[],selId=null;
+const DGVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const DGFS=`precision highp float;uniform sampler2D uMap;uniform float uOp,uWhite;varying vec2 vUv;
+void main(){vec4 t=texture2D(uMap,vUv);float lum=dot(t.rgb,vec3(.299,.587,.114));
+  float a=smoothstep(.82,.45,lum)*t.a;vec3 c=mix(t.rgb,vec3(1.),uWhite);gl_FragColor=vec4(c,a*uOp);}`;
+const DEF={x:0,y:0,z:.6,rx:0,ry:0,size:1,white:1,opacity:1,etch:1};
+function dgMesh(o){const tex=new THREE.TextureLoader().load(o.data.url||("/_blob/"+o.data.asset),t=>{const a=t.image.width/t.image.height;o.mesh.scale.set(a,1,1);applyDg(o)});
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.ShaderMaterial({uniforms:{uMap:{value:tex},uOp:{value:1},uWhite:{value:1}},vertexShader:DGVS,fragmentShader:DGFS,transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+  m.renderOrder=2;o.mesh=m;scene.add(m);applyDg(o)}
+function applyDg(o){const d={...DEF,...o.data},m=o.mesh;if(!m)return;const a=m.scale.x/(m.scale.y||1)||1;
+  m.position.set(d.x,d.y,d.z);m.rotation.set(d.rx,d.ry,0);m.scale.set(a*d.size,d.size,1);m.material.uniforms.uWhite.value=d.white;m.visible=!d.etch&&(typeof diagOn==="undefined"||diagOn);updateEtch()}
+/* the latest etched diagram is cut into every photograph, fitted inside its frame */
+function updateEtch(){const e=[...dgObjs].reverse().find(o=>({...DEF,...o.data}).etch&&o.mesh&&o.mesh.material.uniforms.uMap.value.image);
+  if(!e){ETCH.uEtchOn.value=0;return}const d={...DEF,...e.data},im=e.mesh.material.uniforms.uMap.value.image,da=im.width/im.height,[fx0,fy0,fx1,fy1]=D.frame,pa=(fx1-fx0)/(fy1-fy0);
+  ETCH.uEtch.value=e.mesh.material.uniforms.uMap.value;ETCH.uEtchFit.value.set(da>pa?1:pa/da,da>pa?da/pa:1);ETCH.uEtchWhite.value=d.white;ETCH.uEtchOp.value=d.opacity;ETCH.uEtchOn.value=1}
+function renderList(){const L=$("#dglist");L.innerHTML="";
+  if(!dgObjs.length){L.innerHTML=`<p>${canEdit?"No diagrams yet. Add one to place it among the shards.":"No diagrams in the space yet."}</p>`;return}
+  dgObjs.forEach((o,i)=>{const d={...DEF,...o.data},it=document.createElement("div");it.className="item"+(o.id===selId?" sel":"");
+    it.innerHTML=`<header><img alt="" src="${o.data.url||("/_blob/"+o.data.asset)}"><span class="mono" style="font:500 10.5px var(--mono);color:var(--dim)">diagram ${i+1}</span></header>`;
+    if(canEdit){const sl=(k,l,mn,mx,st)=>{const lab=document.createElement("label");lab.innerHTML=`${l}<input type="range" min="${mn}" max="${mx}" step="${st}" value="${d[k]}">`;
+        lab.querySelector("input").oninput=e=>{o.data[k]=+e.target.value;applyDg(o);save(o)};it.append(lab)};
+      sl("x","across",-1.6,1.6,.01);sl("y","up",-1.4,1.4,.01);sl("z","depth",-1.6,1.6,.01);sl("size","size",.15,2.5,.01);sl("ry","turn",-3.14,3.14,.01);sl("rx","tilt",-1.57,1.57,.01);sl("opacity","strength",.1,1,.01);
+      const row=document.createElement("div");row.className="row";
+      const eb=document.createElement("button");eb.textContent=d.etch?"Etched into the photographs":"Floating in the space";eb.title="Etch it into each photograph where its lines cut nothing, or float it among the shards";eb.onclick=()=>{o.data.etch=d.etch?0:1;applyDg(o);save(o);renderList()};
+      const wb=document.createElement("button");wb.textContent=d.white?"Lines white":"Lines as drawn";wb.onclick=()=>{o.data.white=d.white?0:1;applyDg(o);save(o);renderList()};
+      const rm=document.createElement("button");rm.textContent="Remove";rm.onclick=async()=>{if(rm.dataset.sure){try{await db.collection("diagrams").doc(o.id).delete()}catch(e){rm.textContent="Could not remove"}}else{rm.dataset.sure=1;rm.textContent="Remove for good?"}};
+      row.append(eb,wb,rm);it.append(row)}
+    L.append(it)})}
+const timers={};function save(o){clearTimeout(timers[o.id]);timers[o.id]=setTimeout(()=>{db.collection("diagrams").doc(o.id).set(o.data).catch(()=>{})},500)}
+$("#dgbtn").onclick=()=>{const p=$("#dg"),v=p.hidden;p.hidden=!v;$("#dgbtn").setAttribute("aria-pressed",String(v))};
+$("#file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f||!assets)return;$("#dgnote").textContent="Uploading the diagram…";
+  try{const r=await assets.upload(f);const ref=db.collection("diagrams").doc();selId=ref.id;await ref.set({...DEF,word:WORD,asset:r.id,url:r.url,added:Date.now()});$("#dgnote").textContent="Placed in front of the sheet. Use the sliders to move it into the sculpture."}
+  catch(err){$("#dgnote").textContent="That file could not be added. Try a PNG or JPG under 20 MB."}};
+/* on the website: Roy's saved marks, read-only, from marks.json */
+(async()=>{if(window.claude)return;{const n=document.getElementById("dgnote");if(n)n.textContent="Lines you draw stay in your own browser. Save an image or record a GIF to keep what you made.";const u=document.getElementById("dgadd");if(u)u.hidden=true}try{const all=await(await fetch("marks.json")).json();all.forEach(m=>{if((m.d.word||"blue-sky")===WORD&&!marks.find(x=>x.id===m.id))marks.push({id:m.id,d:m.d})});renderMarks()}catch(e){}})();
+(async()=>{if(!window.claude||!claude.use)return;
+  const [d_,a_,u_,dl_]=await Promise.all([claude.use("db"),claude.use("assets"),claude.use("user"),claude.use("downloads")]);db=d_;assets=a_;canEdit=!!(u_&&u_.canEdit&&u_.canEdit())&&!!assets;
+  dls=dl_;$("#saveimg").hidden=!dls;$("#dgnote").textContent=canEdit?$("#dgnote").textContent:"Lines you draw stay in your own browser. Save image keeps a copy of what you made.";
+  $("#dgadd").hidden=!canEdit;if(!db)return;
+  db.collection("strokes").orderBy("added").onSnapshot(snap=>{const seen=new Set();
+    snap.docs.forEach(s_=>{const d_=s_.data();if(!d_||(d_.word||"blue-sky")!==WORD)return;seen.add(s_.id);const ex=marks.find(m=>m.id===s_.id);if(ex)ex.d=d_;else marks.push({id:s_.id,d:d_})});
+    marks=marks.filter(m=>m.local||m.pending||m.own||seen.has(m.id));renderMarks()},()=>{});
+  db.collection("diagrams").orderBy("added").onSnapshot(snap=>{const seen=new Set();
+    snap.docs.forEach(s=>{const data=s.data();if(!data||(data.word||"blue-sky")!==WORD)return;seen.add(s.id);let o=dgObjs.find(x=>x.id===s.id);
+      if(!o){o={id:s.id,data};dgObjs.push(o);dgMesh(o)}else if(!timers[o.id]||!document.activeElement||document.activeElement.type!=="range"){o.data=data;applyDg(o)}});
+    dgObjs=dgObjs.filter(o=>{if(seen.has(o.id))return true;scene.remove(o.mesh);return false});renderList()},()=>{});
+})();
+
+build().catch(e=>{$("#loading").textContent="THE PHOTOGRAPHS DID NOT LOAD. RELOAD TO TRY AGAIN.";console.error(e)});
+</script>
+

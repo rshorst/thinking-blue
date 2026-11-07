@@ -1,0 +1,306 @@
+<meta charset="utf-8">
+<title>Orbits of Blue: Names</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+/* Layout: the same two-page spread as the plates. Verso = the namer, its facts, its names. Recto = the orbit chart, full bleed. */
+:root{
+  --table:#d9dde3; --table-ink:#3b4452;
+  --paper:#f2f2ee; --ink:#1c2330; --ink-2:#5b6474; --ink-3:#a5abb6; --rule:#c9ccd2; --edge:rgba(28,35,48,.25); --gutter:rgba(28,35,48,.10);
+  --word:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --text:"EB Garamond","Garamond","Iowan Old Style",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}}
+:root[data-theme="dark"]{--table:#11151c;--table-ink:#9aa4b4;color-scheme:dark}
+.spread[data-ground="night"]{--paper:#070b16;--ink:#e4e9f2;--ink-2:#7f8ba3;--ink-3:#3a4560;--rule:#26314a;--edge:rgba(228,233,242,.22);--gutter:rgba(0,0,0,.55)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--table);color:var(--table-ink);font:14px/1.5 var(--text);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 32px;
+  display:flex;flex-direction:column;align-items:center;gap:18px}
+.spread,.turn{width:min(100%,calc((100vh - 150px) * 1.5),1600px)}
+.spread{display:grid;grid-template-columns:1fr 1fr;box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35);background:var(--paper);color:var(--ink)}
+.page{aspect-ratio:3/4;container-type:inline-size;position:relative;min-width:0;overflow:hidden}
+.in{height:100%;display:flex;flex-direction:column}
+.verso{background:linear-gradient(to left,var(--gutter),transparent 7%) var(--paper)}
+.verso .in{padding:7cqi 9cqi 6cqi 11cqi}
+.recto{background:var(--paper)}
+.head{display:flex;justify-content:space-between;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.word{font:300 clamp(28px,8.6cqi,76px)/1 var(--word);margin:7cqi 0 0 -.05em;letter-spacing:-.05em;text-wrap:balance}
+.word .pre{color:var(--ink-2);margin-right:.25em}
+.word .term{font:400 1.32em/1 var(--text);letter-spacing:-.01em}
+.word .term.hex{font:300 1em/1 var(--word);letter-spacing:-.05em;color:var(--ink)}
+.word.long .term{font-size:1em}
+.about{margin:3.4cqi 0 0;font:400 clamp(12px,2.2cqi,18px)/1.42 var(--text);max-width:34em}
+.about .t{font-style:italic}
+.mat{margin-top:3.4cqi;flex:1 1 0;min-height:0;overflow:auto;font:400 clamp(11px,1.9cqi,15px)/1.3 var(--text);scrollbar-width:thin;scrollbar-color:var(--rule) transparent;padding:0 1em 2em 0;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent)}
+.names{display:flex;flex-wrap:wrap;gap:.3em 1.1em;align-content:start}
+.nm{cursor:default;white-space:nowrap}
+.nm i{display:inline-block;width:.7em;height:.7em;margin-right:.4em;vertical-align:.02em;border:1px solid var(--edge)}
+.nm sup{font:400 .62em/1 var(--mono);color:var(--ink-2);margin-left:.15em}
+.nm.on{color:var(--ink);text-decoration:underline;text-underline-offset:.2em}
+.sys{display:grid;grid-template-columns:1fr auto auto;gap:.2em 1.4em;align-items:baseline;font-size:1.08em}
+.sys a{color:inherit;text-decoration:none;cursor:pointer}
+.sys a:hover,.sys a:focus-visible{text-decoration:underline;text-underline-offset:.2em;outline:none}
+.sys span{font:400 .66em/1 var(--mono);color:var(--ink-2);font-variant-numeric:tabular-nums;text-align:right}
+.sys .sw{display:inline-block;width:.7em;height:.7em;margin-right:.5em;vertical-align:.02em}
+.colo{margin-top:auto;padding-top:1em;font:400 clamp(8.5px,1.5cqi,12px)/1.6 var(--mono);color:var(--ink-2);display:grid;gap:.45em}
+.colo p{margin:0;max-width:62ch}
+.colo b{font-weight:500;color:var(--ink)}
+.colo .mh{font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .1em}
+.colo details{border-top:1px solid var(--rule);padding-top:.5em}
+.colo summary{cursor:pointer;list-style:none;color:var(--ink)}
+.colo summary::-webkit-details-marker{display:none}
+.colo summary::before{content:"+";display:inline-block;width:1.2em;color:var(--ink-2)}
+.colo details[open] summary::before{content:"−"}
+.colo details>p,.colo details>div{margin:.4em 0 .2em 1.2em}
+.colo details>div p{margin-top:.4em}
+.alist{display:flex;flex-wrap:wrap;gap:.3em 1.1em}
+.alist button{border-bottom-color:transparent!important;color:var(--ink-2)!important}
+.alist button[aria-pressed="true"]{color:var(--ink)!important;border-bottom-color:currentColor!important}
+.colo button{font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--rule);padding:0;cursor:pointer;white-space:nowrap}
+button:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.folio{display:flex;justify-content:space-between;align-items:baseline;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2);margin-top:4cqi}
+.plate{position:absolute;inset:0}
+.plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+.plate canvas.drag{cursor:grabbing}
+.hint{position:absolute;z-index:3;left:9cqi;bottom:5cqi;margin:0;font:400 clamp(8px,1.4cqi,11px)/1.5 var(--mono);color:var(--ink-2);pointer-events:none}
+.note .also{display:flex;flex-wrap:wrap;gap:.2em .9em;margin-top:.6em}
+.note .also span{white-space:nowrap}
+.note .also i{display:inline-block;width:.6em;height:.6em;border-radius:50%;margin-right:.35em}
+.note .also small{color:var(--ink-2)}
+.recto .head,.recto .fo{position:absolute;left:0;right:0;padding-inline:9cqi 7cqi;z-index:2;pointer-events:none}
+.recto .head{top:0;padding-top:7cqi;padding-bottom:6cqi;background:linear-gradient(var(--paper) 55%,transparent)}
+.recto .fo{bottom:0;padding-block:5cqi 6cqi;display:flex;justify-content:flex-end;font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
+.note{position:absolute;z-index:4;left:9cqi;top:14cqi;max-width:46cqi;display:flex;gap:2cqi;align-items:flex-start;padding:1.6cqi 2cqi;background:color-mix(in srgb,var(--paper) 90%,transparent);font:400 clamp(8.5px,1.5cqi,12px)/1.55 var(--mono);color:var(--ink-2);pointer-events:none}
+.note:empty{display:none}
+.note .sw{width:7cqi;height:7cqi;flex:none}
+.note b{display:block;font:400 clamp(11px,2.1cqi,17px)/1.25 var(--text);color:var(--ink);margin-bottom:.25em}
+.note em{display:block;font:italic 400 clamp(10px,1.8cqi,14px)/1.3 var(--text);color:var(--ink);margin-top:.4em}
+.turn{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline;font:500 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--table-ink)}
+.turn button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer}
+.turn button:disabled{opacity:.35;cursor:default}
+.grounds{flex-basis:100%;display:flex;justify-content:center;gap:16px}
+.grounds .cover{color:inherit;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.grounds .cover:hover,.grounds .cover:focus-visible{border-bottom-color:currentColor;outline:none}
+.grounds span{padding:4px 0;opacity:.5}
+.grounds button[aria-pressed="true"]{border-bottom:1px solid currentColor}
+.idx{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px;max-width:72%}
+.idx a{color:inherit;text-decoration:none;opacity:.85;border-bottom:1px solid transparent}
+.idx a:hover{border-bottom-color:currentColor}
+.idx a[aria-current="true"]{opacity:1;border-bottom-color:currentColor}
+@media (max-width:760px){
+  .spread{grid-template-columns:1fr;width:100%}
+  .verso{aspect-ratio:auto}
+  .verso .in{padding:9cqi 8cqi 7cqi}
+  .mat{flex:none;max-height:60vh}
+  .turn{justify-content:center}
+  .idx{max-width:100%}
+}
+</style>
+
+<div class="spread" id="spread" data-ground="night">
+  <section class="page verso" aria-label="Verso"><div class="in">
+    <div class="head"><span>Orbits of Blue</span><span id="pg-l"></span></div>
+    <h1 class="word" id="word"></h1>
+    <p class="about" id="about"></p>
+    <div class="mat" id="mat"></div>
+    <div class="colo">
+      <p class="mh">Method</p>
+      <details><summary>Sources</summary><p id="counts"></p><p id="arrived"></p></details>
+      <details open><summary>Arrangement: <b id="aname"></b></summary><div><div class="alist" id="alist" role="group" aria-label="Arrangements"></div><p id="arule"></p></div></details>
+    </div>
+    <div class="folio"><span id="fo-l"></span><span></span></div>
+  </div></section>
+  <section class="page recto" aria-label="Recto">
+    <div class="plate"><canvas id="cv" aria-label="Orbit chart: 730 namings of blue circling #0000ff"></canvas></div>
+    <div class="head"><span id="pg-r"></span><span>Thinking Blue</span></div>
+    <div class="note" id="note" aria-live="polite"></div>
+    <p class="hint" id="hint"></p>
+    <div class="fo"><span id="fo-r"></span></div>
+  </section>
+</div>
+<nav class="turn" aria-label="Spreads">
+  <button id="prev" type="button">← previous</button>
+  <div class="idx" id="idx"></div>
+  <button id="next" type="button">next →</button>
+  <div class="grounds" role="group" aria-label="Ground"><a class="cover" href="../">← Thinking Blue</a><span aria-hidden="true">·</span><button type="button" data-g="paper" aria-pressed="false">paper</button><button type="button" data-g="night" aria-pressed="true">blue-black</button></div>
+</nav>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const cv=$("cv"),ctx=cv.getContext("2d"),note=$("note");
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hex2=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const tok=n=>getComputedStyle($("spread")).getPropertyValue(n).trim();
+const smooth=k=>{k=Math.min(1,Math.max(0,k));return k*k*(3-2*k)};
+const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+let D=null,S=[],cur=0,arr="attention";
+
+/* the chart, as in the first Orbits: hue around the circle with #0000ff's hue at the top, the blue sector stretched to a full turn */
+let W=0,H=0,R=1,dpr=1,T={x:0,y:0,k:1},hover=null,pinned=null,litSys=-1,HALOS=[],GROUPS_ARC=[],PAIRS=[],anim=0;
+const HALO=1.1,STOPW=new Set(["blue","bleu","the","de","of","out"]);
+const angle=hu=>-Math.PI/2+((hu-205)/110-(306-205)/110)*2*Math.PI;
+const ARR={
+  attention:{name:"How often named.",rule:"Outward by how many naming systems name nearly the same colour (ΔE under 5): most named at the centre, named by one system at the edge.",
+    r:(p,m)=>.05+(m.kmax-p.k)*(.76/(m.kmax-1))+p.L/100*.16},
+  lightness:{name:"Lightness.",rule:"Outward by lightness: dark at the centre, light at the edge.",r:p=>.05+p.L/100*.92},
+  distance:{name:"Distance from #0000ff.",rule:"Outward by colour difference from the screen’s pure blue: nearest at the centre.",r:p=>.05+Math.min(p.d/155,1)*.92},
+  chroma:{name:"Greyed to vivid.",rule:"Outward by chroma: greyed blues at the centre, vivid at the edge.",r:p=>.05+Math.min(p.c/110,1)*.92},
+  system:{name:"Naming system.",rule:"One band per system, by date outward; the two traditional lists, undated, outermost. Within a band, dark inside.",r:p=>.08+p.s*.083+p.L/100*.06},
+  spiral:{name:"Spiral.",rule:"Outward by lightness, nudged out by agreement.",r:p=>.05+(p.k-1)*.05+p.L/100*.68}
+};
+const ORDER=Object.keys(ARR);
+const lit=i=>{const s=D.rows[i].s;return litSys>=0?s===litSys:(cur===0||s===cur-1)};
+function target(p){const m={kmax:6},a=angle(p.hu),r=ARR[arr].r(p,m);return[Math.cos(a)*r,Math.sin(a)*r]}
+function prepChart(){
+  D.rows.forEach((p,i)=>{p.i=i;[p.x,p.y]=target(p);p.ang=angle(p.hu);p.rgb=hex2(p.h)});
+  PAIRS=D.pairs.slice().sort((a,b)=>b[2]-a[2]);
+  /* the names with no published colour: grouped arcs on the outer orbit, each reaching in to any coloured namesake */
+  const GROUPS=[["pigment","pigments"],["sky-water","sky and water"],["places-cloth","places and cloth"],["institutions-machines","institutions and machines"],["stones-plants-animals","stones, plants, animals"],["languages","other languages"],["idiom","idioms"]];
+  const norm=s=>s.toLowerCase().replace(/\s*\(.*\)$/,"").replace(/[’']/g,"'").trim();
+  let slot=0;const GAP=3,total=D.none.length+GAP*GROUPS.length;
+  GROUPS.forEach(([key,label])=>{const mem=D.none.filter(nm=>(D.noneGroup[nm]||"idiom")===key),start=slot;
+    mem.forEach(nm=>{const a=-Math.PI/2+((slot+.5)/total)*2*Math.PI,words=norm(nm).split(/[\s-]+/).filter(w=>w.length>3&&!STOPW.has(w));
+      const m=D.rows.filter(p=>{const pn=norm(p.n);if(pn===norm(nm))return true;const pw=pn.split(/[\s,-]+/);return words.length&&words.every(w=>pw.includes(w))}).map(p=>p.i);
+      HALOS.push({halo:true,n:nm,g:label,a,m});slot++});
+    GROUPS_ARC.push({label,a0:-Math.PI/2+(start/total)*2*Math.PI,a1:-Math.PI/2+(slot/total)*2*Math.PI});slot+=GAP});
+}
+function resize(){const r=cv.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2.5);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  R=Math.min(W,H)/2/1.42;if(!T.set){T={x:W/2,y:H*.53,k:1,set:1}}draw()}
+const sx=x=>T.x+T.k*x*R,sy=y=>T.y+T.k*y*R;
+function related(p){if(!p)return null;if(p.halo)return new Set(p.m);const s=new Set(p.nb);s.add(p.i);return s}
+function text(str,x,y,ang,size,color){ctx.save();ctx.translate(x,y);const flip=Math.cos(ang)<0;ctx.rotate(flip?ang+Math.PI:ang);
+  ctx.font=`italic ${size}px "EB Garamond", Georgia, serif`;ctx.fillStyle=color;ctx.textAlign=flip?"right":"left";ctx.textBaseline="middle";ctx.fillText(str,flip?-size*.6:size*.6,0);ctx.restore()}
+function draw(){
+  if(!D)return;const C={night:tok("--paper"),rule:tok("--rule"),chalk:tok("--ink"),dust:tok("--ink-2")},NIGHT=hex2(C.night.length===7?C.night:"#070b16");
+  const N=D.rows;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle=C.night;ctx.fillRect(0,0,W,H);
+  const k=T.k,focus=pinned||hover,rel=related(focus);
+  ctx.strokeStyle=C.rule;ctx.lineWidth=.6;
+  (arr==="attention"?[.05,.2,.35,.5,.65,.81]:[.25,.5,.75,.97]).forEach(t=>{ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(sx(0),sy(0),t*R*k,0,2*Math.PI);ctx.stroke()});
+  ctx.globalAlpha=.5;ctx.beginPath();ctx.arc(sx(0),sy(0),HALO*R*k,0,2*Math.PI);ctx.stroke();ctx.globalAlpha=1;
+  const g=ctx.createRadialGradient(sx(0),sy(0),0,sx(0),sy(0),.18*R*k);g.addColorStop(0,"rgba(0,0,255,0.55)");g.addColorStop(1,"rgba(0,0,255,0)");ctx.fillStyle=g;
+  ctx.beginPath();ctx.arc(sx(0),sy(0),.18*R*k,0,2*Math.PI);ctx.fill();ctx.fillStyle="#0000ff";ctx.beginPath();ctx.arc(sx(0),sy(0),Math.max(5,.025*R*k),0,2*Math.PI);ctx.fill();
+  /* threads: every pair of namings closer than ΔE 15, coloured by the pair and darkening into the ground with distance */
+  for(const [i,j,d] of PAIRS){const a=N[i],b=N[j],on=lit(i)&&lit(j),touches=focus&&!focus.halo&&(i===focus.i||j===focus.i);
+    if(!on&&!touches)continue;const f=Math.pow(1-d/15,1.4),c=[0,1,2].map(q=>Math.round(NIGHT[q]+((a.rgb[q]+b.rgb[q])/2-NIGHT[q])*f));
+    ctx.strokeStyle=`rgb(${c})`;ctx.lineWidth=touches?1.4:.45+.9*f;ctx.globalAlpha=touches?.95:(focus?.07:.22+.5*f);
+    const mx=(a.x+b.x)/2*.86,my=(a.y+b.y)/2*.86;ctx.beginPath();ctx.moveTo(sx(a.x),sy(a.y));ctx.quadraticCurveTo(sx(mx),sy(my),sx(b.x),sy(b.y));ctx.stroke()}
+  /* on a system's spread: its names reach to the same word in other systems */
+  if(cur>0&&litSys<0){ctx.setLineDash([3,4]);ctx.lineWidth=.9;N.forEach((p,i)=>{if(!lit(i))return;p.ns.forEach(j=>{const q=N[j];ctx.strokeStyle=q.h;ctx.globalAlpha=focus?(focus.i===i||focus.i===j?.95:.06):.6;
+    ctx.beginPath();ctx.moveTo(sx(p.x),sy(p.y));ctx.lineTo(sx(q.x),sy(q.y));ctx.stroke()})});ctx.setLineDash([])}
+  ctx.globalAlpha=1;const zs=Math.pow(k,.45);
+  ctx.globalCompositeOperation=$("spread").dataset.ground==="night"?"lighter":"multiply";
+  for(const p of N){if(!lit(p.i)||(rel&&!rel.has(p.i)))continue;const r=(1.4+p.k*1.1)*zs;ctx.globalAlpha=.16;ctx.fillStyle=p.h;ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),r*2.6,0,2*Math.PI);ctx.fill()}
+  ctx.globalCompositeOperation="source-over";
+  for(const p of N){const dim=!lit(p.i)||(rel&&!rel.has(p.i)),r=(1.4+p.k*1.1)*zs;ctx.globalAlpha=dim?.12:1;ctx.fillStyle=p.h;ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),r,0,2*Math.PI);ctx.fill();
+    if(p===focus){ctx.globalAlpha=1;ctx.strokeStyle=C.chalk;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),r+4,0,2*Math.PI);ctx.stroke()}}
+  ctx.globalAlpha=1;
+  /* labels: more appear as you zoom in */
+  const showAll=k>=2.4,size=Math.min(15,9.5+(k-1)*.9);
+  for(const p of N){if(!lit(p.i))continue;const isRel=rel&&rel.has(p.i);
+    if(!(isRel||showAll||p.k>=5||(k>=1.6&&p.k>=4)||(cur>0&&k>=1.3)))continue;if(rel&&!isRel&&k<2.4)continue;
+    const x=sx(p.x),y=sy(p.y);if(x<-60||x>W+60||y<-60||y>H+60)continue;text(p.n,x,y,p.ang,isRel?size+1.5:size,isRel||!rel?C.chalk:C.dust)}
+  /* the outer orbit: names with no published colour */
+  const hk=Math.min(17,12.5+(k-1)*1.1);
+  for(const G of GROUPS_ARC){ctx.strokeStyle=C.dust;ctx.globalAlpha=.45;ctx.lineWidth=1;ctx.beginPath();ctx.arc(sx(0),sy(0),(HALO-.035)*R*k,G.a0,G.a1);ctx.stroke();
+    const am=(G.a0+G.a1)/2,lr=(HALO-.075)*R*k;ctx.save();ctx.translate(sx(0)+Math.cos(am)*lr,sy(0)+Math.sin(am)*lr);const up=Math.sin(am)>0;ctx.rotate(am+(up?-Math.PI/2:Math.PI/2));
+    ctx.font=`500 ${Math.max(8,9+(k-1)*.6)}px "IBM Plex Mono", monospace`;ctx.fillStyle=C.dust;ctx.globalAlpha=.9;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(G.label.toUpperCase().split("").join(" "),0,0);ctx.restore()}
+  const hf=focus&&focus.halo?focus:null;
+  for(const h of HALOS){if(!h.m.length)continue;const on=hf===h,x=sx(Math.cos(h.a)*HALO),y=sy(Math.sin(h.a)*HALO);
+    for(const i of h.m){const p=N[i];if(!lit(i)&&!on)continue;ctx.setLineDash([3,4]);ctx.strokeStyle=on?p.h:C.chalk;ctx.globalAlpha=on?.95:(focus?.05:.18);ctx.lineWidth=on?1.4:.8;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(sx(Math.cos(h.a)*.6),sy(Math.sin(h.a)*.6),sx(p.x),sy(p.y));ctx.stroke()}}
+  ctx.setLineDash([]);
+  for(const h of HALOS){const x=sx(Math.cos(h.a)*HALO),y=sy(Math.sin(h.a)*HALO),on=hf===h,faded=(focus&&!on)||cur>0;
+    ctx.globalAlpha=faded?.35:1;ctx.strokeStyle=C.chalk;ctx.lineWidth=on?2:1.2;ctx.beginPath();ctx.arc(x,y,(on?6:4.2)*zs,0,2*Math.PI);ctx.stroke();
+    if(h.m.length){ctx.fillStyle=N[h.m[0]].h;ctx.beginPath();ctx.arc(x,y,1.8*zs,0,2*Math.PI);ctx.fill()}
+    text(h.n,x,y,h.a,on?hk+2:hk,faded?C.dust:C.chalk)}
+  ctx.globalAlpha=1;
+  $("hint").textContent=`Drag to move, scroll to zoom, click a dot to hold it · ×${k.toFixed(1)}${k<2.4?" · zoom in for every name":""}`;
+}
+function noteRow(p){
+  if(p.halo){note.innerHTML=`<div><b>${esc(p.n)}</b>${esc(p.g)} · no published colour<br>${p.m.length?"Its name returns inside the circle, attached to a colour by:":"None of the eleven systems gives this name a colour. It stays outside, with no position."}<div class="also">${p.m.slice(0,14).map(i=>{const q=D.rows[i];return`<span><i style="background:${q.h}"></i>${esc(q.n)} <small>(${esc(S[q.s].short)})</small></span>`}).join("")}</div></div>`;return}
+  const s=S[p.s],[r,g,b]=p.rgb,also=p.nb.map(j=>D.rows[j]).sort((a,b)=>(a.s===p.s)-(b.s===p.s));
+  note.innerHTML=`<span class="sw" style="background:${p.h}"></span><div><b>${esc(p.n)}</b>${p.h.toUpperCase()} · R ${r} G ${g} B ${b}<br>${esc(s.short)}${s.year&&s.year!=="undated"?", "+esc(s.year):""} · lightness ${Math.round(p.L)} · ΔE ${Math.round(p.d)} from #0000ff<br>${p.k>1?`Named nearly alike by ${p.k} systems`:"Named by this system only"}${p.ns.length?`<br>The same name in ${p.ns.map(j=>esc(S[D.rows[j].s].short)).join(", ")}, as a different blue`:""}${p.w?`<em>${esc(p.w.split(" | ").join(" · "))}</em>`:""}${also.length?`<div class="also">${also.slice(0,16).map(q=>`<span><i style="background:${q.h}"></i>${esc(q.n)} <small>(${esc(S[q.s].short)})</small></span>`).join("")}</div>`:""}</div>`}
+const showNote=()=>{const p=pinned||hover;if(p)noteRow(p);else note.innerHTML=""};
+function nearest(mx,my){let best=null,bd=14*14;
+  for(const h of HALOS){const dx=sx(Math.cos(h.a)*HALO)-mx,dy=sy(Math.sin(h.a)*HALO)-my,d=dx*dx+dy*dy;if(d<bd){bd=d;best=h}}
+  for(const p of D.rows){if(!lit(p.i))continue;const dx=sx(p.x)-mx,dy=sy(p.y)-my,d=dx*dx+dy*dy;if(d<bd){bd=d;best=p}}return best}
+/* drag to move, scroll or pinch to zoom, click to hold */
+let drag=null;const pts=new Map();
+cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);drag={x:e.clientX,y:e.clientY,tx:T.x,ty:T.y,moved:0,d0:null,k0:T.k};
+  if(pts.size===2){const [a,b]=[...pts.values()];drag.d0=Math.hypot(a[0]-b[0],a[1]-b[1])}});
+cv.addEventListener("pointermove",e=>{const r=cv.getBoundingClientRect();
+  if(drag&&pts.has(e.pointerId)){pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2&&drag.d0){const [a,b]=[...pts.values()];zoomAt((a[0]+b[0])/2-r.left,(a[1]+b[1])/2-r.top,drag.k0*Math.hypot(a[0]-b[0],a[1]-b[1])/drag.d0/T.k);return}
+    const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved=Math.max(drag.moved,Math.hypot(dx,dy));if(drag.moved>3){cv.classList.add("drag");T.x=drag.tx+dx;T.y=drag.ty+dy;draw()}return}
+  if(e.pointerType==="touch")return;const p=nearest(e.clientX-r.left,e.clientY-r.top);if(p!==hover){hover=p;showNote();draw()}});
+const end=e=>{pts.delete(e.pointerId);cv.classList.remove("drag");if(drag&&drag.moved<=3&&e.type==="pointerup"){const r=cv.getBoundingClientRect(),p=nearest(e.clientX-r.left,e.clientY-r.top);pinned=(p&&p!==pinned)?p:null;showNote();draw()}if(!pts.size)drag=null};
+cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+cv.addEventListener("pointerleave",()=>{if(drag)return;hover=null;showNote();draw()});
+function zoomAt(x,y,f){const k=Math.min(16,Math.max(.7,T.k*f));f=k/T.k;T.x=x-(x-T.x)*f;T.y=y-(y-T.y)*f;T.k=k;draw()}
+cv.addEventListener("wheel",e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)))},{passive:false});
+cv.addEventListener("dblclick",()=>{T={x:W/2,y:H*.53,k:1,set:1};draw()});
+function setArr(a){arr=a;markArr();$("arule").textContent=ARR[a].rule;
+  const N=D.rows,from=N.map(p=>[p.x,p.y]),to=N.map(target);cancelAnimationFrame(anim);
+  if(reduce){N.forEach((p,i)=>{[p.x,p.y]=to[i]});draw();return}
+  const t0=performance.now(),step=now=>{const t=Math.min(1,(now-t0)/900),e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    N.forEach((p,i)=>{p.x=from[i][0]+(to[i][0]-from[i][0])*e;p.y=from[i][1]+(to[i][1]-from[i][1])*e});draw();if(t<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+
+/* the verso */
+function show(i,turn){cur=i;hover=pinned=null;litSys=-1;note.innerHTML="";T={x:W/2,y:H*.53,k:1,set:1};const N=S.length+1;
+  const w=$("word");w.classList.toggle("long",i>0&&S[i-1].short.length+S[i-1].year.length>14);
+  if(i===0){w.innerHTML=`<span class="pre">blue:</span><span class="term hex">#0000ff</span>`;
+    $("about").innerHTML=`Every named blue in the collection, circling the screen’s pure blue. Around the circle is hue, from violet through #0000ff’s own hue at the top to green-blue, stretched so the blues fill the turn.`;
+    $("mat").innerHTML=`<div class="sys">${S.map((s,k)=>`<a data-s="${k}" tabindex="0"><span class="sw" style="background:${sysColour(k)}"></span>${esc(s.title)}</a><span>${esc(s.year||"")}</span><span>${s.rows}</span>`).join("")}</div>`;
+    $("counts").textContent=`${D.unique} names, ${D.rows.length} namings, from eleven systems. A name two systems share appears once for each, in each one’s blue. Dot size: how many systems name nearly the same colour.`;
+    $("arrived").textContent=`All eleven lists arrived through one open bundle of colour-name lists, each name with a hex value attached. Only the blues were kept, by the same rule for every list: CIELAB hue 205–315°, chroma over 10.`}
+  else{const s=S[i-1],ids=D.rows.map((r,j)=>j).filter(j=>D.rows[j].s===i-1);
+    w.innerHTML=`<span class="pre">blue:</span><span class="term">${esc(s.short)}${s.year&&s.year!=="undated"?", "+esc(s.year):""}</span>`;
+    $("about").innerHTML=`<span class="t">${esc(s.title)}.</span> ${esc(s.about)}`;
+    $("mat").innerHTML=`<div class="names">${ids.map(j=>{const r=D.rows[j];return`<span class="nm" data-i="${j}"><i style="background:${r.h}"></i>${esc(r.n)}${r.ns.length?`<sup>+${r.ns.length}</sup>`:""}</span>`}).join("")}</div>`;
+    const shared=ids.filter(j=>D.rows[j].ns.length).length;
+    $("counts").textContent=`${s.rows} namings, ${s.uniq} names new to the collection. ${s.lang}. ${shared?`${shared} of its names are also used by another system, for a different blue (marked +).`:"None of its names is used by another system."}`;
+    $("arrived").textContent=`Arrived through the open bundle of colour-name lists. Source: ${s.src.replace(/^https?:\/\//,"")}. Licence: ${s.lic==="unknown"?"not stated":s.lic}.`}
+  $("pg-l").textContent=i===0?"Names":"Names · "+i;$("pg-r").textContent=i===0?"#0000ff":S[i-1].short;
+  $("fo-l").textContent=String(2*i+2);$("fo-r").textContent=String(2*i+3);
+  document.querySelectorAll(".idx a").forEach((a,k)=>a.setAttribute("aria-current",k===i));
+  $("prev").disabled=i===0;$("next").disabled=i===N-1;
+  draw();
+  try{history.replaceState(null,"","#"+(i===0?"names":slugify(S[i-1].short)))}catch(e){}
+}
+/* a system's colour in the list: the blue it names most often, nearest the middle of its range */
+function sysColour(k){const rs=D.rows.filter(r=>r.s===k).sort((a,b)=>a.L-b.L);return rs[Math.floor(rs.length/2)].h}
+
+/* hovering the verso */
+const verso=document.querySelector(".verso .in");
+verso.addEventListener("pointerover",e=>{const n=e.target.closest("[data-i]"),s=e.target.closest("[data-s]");
+  if(n){hover=D.rows[+n.dataset.i];litSys=-1;showNote();draw();return}
+  if(s){litSys=+s.dataset.s;hover=null;const x=S[litSys];note.innerHTML=`<span class="sw" style="background:${sysColour(litSys)}"></span><div><b>${esc(x.title)}</b>${esc(x.year||"")} · ${x.rows} namings · ${esc(x.lang)}</div>`;draw();return}
+  if(hover||litSys>=0){hover=null;litSys=-1;showNote();draw()}});
+verso.addEventListener("pointerleave",()=>{if(hover||litSys>=0){hover=null;litSys=-1;showNote();draw()}});
+$("mat").addEventListener("click",e=>{const s=e.target.closest("[data-s]");if(s)show(+s.dataset.s+1,1)});
+$("mat").addEventListener("keydown",e=>{const s=e.target.closest("[data-s]");if(s&&(e.key==="Enter"||e.key===" ")){e.preventDefault();show(+s.dataset.s+1,1)}});
+
+/* turning */
+$("alist").innerHTML=ORDER.map(k=>`<button type="button" data-a="${k}">${ARR[k].name.replace(/\.$/,"")}</button>`).join("");
+$("alist").querySelectorAll("button").forEach(b=>b.onclick=()=>setArr(b.dataset.a));
+const markArr=()=>{$("aname").textContent=ARR[arr].name.replace(/\.$/,"");$("alist").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.a===arr))};
+$("prev").onclick=()=>show(cur-1,1);$("next").onclick=()=>show(cur+1,1);
+document.querySelectorAll(".grounds button").forEach(b=>b.onclick=()=>{$("spread").dataset.ground=b.dataset.g;document.querySelectorAll(".grounds button").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+new ResizeObserver(()=>{if(D)resize()}).observe(cv);
+
+Promise.all([fetch("names-data.json").then(r=>r.json()),document.fonts?document.fonts.ready:0]).then(([d])=>{D=d;S=d.systems;
+  $("idx").innerHTML=[`<a href="#names">#0000ff</a>`,...S.map(s=>`<a href="#${slugify(s.short)}">${esc(s.short)}</a>`)].join("");
+  $("idx").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();show([...$("idx").children].indexOf(a),1)});
+  prepChart();markArr();$("arule").textContent=ARR[arr].rule;resize();
+  const h=location.hash.slice(1),k=S.findIndex(s=>slugify(s.short)===h);show(k>=0?k+1:0,1)});
+})();
+</script>
