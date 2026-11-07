@@ -431,8 +431,8 @@ const h=location.hash.slice(1);
   body.navshow .peek{opacity:0;pointer-events:none}
 }
 @media (max-width:760px){.peek{display:none}}
-.head a.home{color:inherit;text-decoration:none;pointer-events:auto}
-.head a.home:hover{text-decoration:underline;text-underline-offset:.25em}
+.head a.home,.rhead a.home,.vhead a.home{color:inherit;text-decoration:none;pointer-events:auto;position:relative;z-index:5}
+.head a.home:hover,.rhead a.home:hover,.vhead a.home:hover{text-decoration:underline;text-underline-offset:.25em}
 </style>
 <button class="peek" type="button" aria-label="Show navigation">contents ▴</button>
 <script>
@@ -440,12 +440,14 @@ const h=location.hash.slice(1);
   const show=()=>{clearTimeout(tm);t.classList.add("show");document.body.classList.add("navshow")};
   const hide=()=>{t.classList.remove("show");document.body.classList.remove("navshow")};
   const later=ms=>{clearTimeout(tm);tm=setTimeout(()=>{if(!t.matches(":hover")&&!t.contains(document.activeElement))hide()},ms)};
+  addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"&&innerHeight-e.clientY<90){show();later(5000)}});
   addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;if(innerHeight-e.clientY<64)show();else if(t.classList.contains("show")&&!t.contains(e.target))later(500)});
   addEventListener("wheel",e=>{if(e.target.closest&&e.target.closest("canvas,.mat,.text,#stepslot"))return;if(e.deltaY>8){show();later(2600)}else if(e.deltaY<-8)hide()},{passive:true});
   pk.onclick=()=>{t.classList.contains("show")?hide():(show(),later(4000))};
   addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
   show();later(2200);
   /* the running head "Thinking Blue" goes back to the cover */
-  if(!document.querySelector(".books"))document.querySelectorAll(".head span").forEach(s=>{if(s.textContent.trim()==="Thinking Blue"){const a=document.createElement("a");a.href="../";a.className="home";a.textContent="Thinking Blue";s.replaceChildren(a)}});
+  {const home=document.querySelector(".books")?"./":"../";
+   document.querySelectorAll(".head span,.rhead span,.vhead span").forEach(s=>{if(s.textContent.trim()==="Thinking Blue"){const a=document.createElement("a");a.href=home;a.className="home";a.textContent="Thinking Blue";s.replaceChildren(a)}})}
 })();
 </script>
