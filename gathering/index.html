@@ -1,4 +1,7 @@
+<!doctype html>
+<html lang="en">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Thinking Blue: Gathering</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -187,7 +190,7 @@ body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important
     <div class="glbox" id="glbox"></div>
     <div class="rhead"><span id="pl-r"></span><span>Thinking Blue</span></div>
     <div class="note" id="tipslot"></div>
-    <p class="hint">Drag to turn · scroll to move in and out · hover a shard for the captions that cut it</p>
+    <p class="hint">Drag to turn · scroll to move in and out</p>
     <div class="fo"><span id="fo-r"></span></div>
   </section>
 </div>
@@ -522,7 +525,7 @@ function applyVis(){const on=m=>sculptOn&&layerOn[m]!==false;photoPlanes.forEach
 $("#lnbtn").onclick=()=>{const b=$("#lnbtn"),on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",String(on));applyVis()};
 $("#phbtn").onclick=()=>{phOn=!phOn;$("#phbtn").setAttribute("aria-pressed",String(phOn));applyVis()};
 $("#shbtn").onclick=()=>{shOn=!shOn;$("#shbtn").setAttribute("aria-pressed",String(shOn));applyVis();if(!shOn)showTip(-1)};
-let hoverOn=true;$("#hvbtn").setAttribute("aria-pressed","true");$("#hvbtn").onclick=()=>{hoverOn=!hoverOn;$("#hvbtn").setAttribute("aria-pressed",String(hoverOn));if(!hoverOn){hovId=-1;showTip(-1)}};
+let hoverOn=false;$("#hvbtn").hidden=true;$("#hvbtn").onclick=()=>{hoverOn=!hoverOn;$("#hvbtn").setAttribute("aria-pressed",String(hoverOn));if(!hoverOn){hovId=-1;showTip(-1)}};
 /* select one photograph's layer, or one named blue */
 function fillSelects(){{const fs=$("#fillsel");const o=document.createElement("option");o.value=K;o.textContent="fill: the sheet";fs.append(o);
     D.photos.forEach((p,m)=>{const q=document.createElement("option");q.value=m;q.textContent=`fill: ${m+1} · ${(p.alt||"untitled").slice(0,22)}`;fs.append(q)});fs.onchange=e=>drawFill=+e.target.value}
@@ -548,7 +551,7 @@ $("#bluesbtn").onclick=()=>panel("#bl","#bluesbtn");$("#bluesbtn2").onclick=()=>
 $("#chroma").oninput=e=>{U.uChroma.value=+e.target.value;const q=document.querySelector('#lightp [data-u="uChroma"]');if(q)q.value=e.target.value};
 
 /* ---------- camera: drag to turn about the middle, scroll, pinch or In/Out to move ---------- */
-let th=.55,ph=.18,dist=3.6,dragging=null,idle=0;const centre=new THREE.Vector3();
+let th=.55,ph=.18,dist=3.6,dragging=null,idle=0;const centre=new THREE.Vector3();const viewShift={x:0,y:0};
 const cv=$("#gl");
 cv.addEventListener("contextmenu",e=>{if(diagMode)e.preventDefault()});
 const pan=new THREE.Vector3();let moveOn=false;   /* where the sculpture sits on screen: slid by move, alt-drag or middle-drag */
@@ -667,6 +670,14 @@ function loop(now){const dt=Math.min(.1,(now-(last||now))/1000);last=now;
   if(!dragging&&!RM&&now-idle>3000){const ta=.42+.38*Math.sin(now*.00011);th+=(ta-th)*.004}   /* a slow sway, never edge-on for long */
   {const g=Math.max(0,Math.min(1,t-3)),zc=ZK(0)/2*(1-g);centre.z+=(zc-centre.z)*.06;
    const tg=centre.clone().add(pan);camera.position.set(tg.x+dist*Math.sin(th)*Math.cos(ph),tg.y+dist*Math.sin(ph),tg.z+dist*Math.cos(th)*Math.cos(ph));camera.lookAt(tg)}
+  /* keep what is visible centred on the page: measure the sculpture on screen and slide the view (not the camera) toward it */
+  if(frame%4===0&&pan.lengthSq()<1e-8&&photoPlanes.length){const w=renderer.domElement.clientWidth,h=renderer.domElement.clientHeight;
+    let mn=1e9,mx=-1e9,my0=1e9,my1=-1e9;const v=new THREE.Vector3(),bx=new THREE.Box3();
+    const prevView=camera.view&&camera.view.enabled?{...camera.view}:null;camera.clearViewOffset();camera.updateMatrixWorld();
+    photoPlanes.forEach((pl,m)=>{if(pl.material.uniforms.uOp.value<.05)return;bx.setFromObject(pl);
+      for(let i=0;i<8;i++){v.set(i&1?bx.max.x:bx.min.x,i&2?bx.max.y:bx.min.y,i&4?bx.max.z:bx.min.z).project(camera);mn=Math.min(mn,v.x);mx=Math.max(mx,v.x);my0=Math.min(my0,v.y);my1=Math.max(my1,v.y)}});
+    if(mn<1e8){const tx=(mn+mx)/2*w/2,ty=-(my0+my1)/2*h/2;viewShift.x+=(tx-viewShift.x)*.15;viewShift.y+=(ty-viewShift.y)*.15}
+    camera.setViewOffset(w,h,viewShift.x,viewShift.y,w,h)}
   if(frame++%3===0&&hoverOn&&meshes.length&&U.uShard.value>0&&shOn&&sculptOn){const id=pick();if(id!==hovId){hovId=id;if(id>=0)U.uHover.value=id;showTip(id);lift=id>=0?0:lift}}
   else if(U.uShard.value<=0&&hovId>=0){hovId=-1;showTip(-1)}
   lift+=((hovId>=0?1:0)-lift)*.12;U.uLift.value=lift;if(hovId<0&&lift<.01)U.uHover.value=-1;
@@ -841,6 +852,7 @@ build().catch(e=>{$("#loading").textContent="THE PHOTOGRAPHS DID NOT LOAD. RELOA
 
 <!-- full-screen book: the spread fills the window; navigation rises from the foot -->
 <style id="fullbook">
+@media (max-width:760px){.stages,.stages .cl{flex-wrap:wrap!important;white-space:normal!important;overflow:visible!important}}
 @media (min-width:761px){
   html,body{height:100%}
   body{padding:0!important;margin:0!important;gap:0!important;min-height:100svh!important;justify-content:center!important;overflow:hidden!important}
