@@ -183,11 +183,16 @@ body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important
       <p id="counts"></p>
       <p><b>Gathering.</b> Each photograph sits on its own plane, the first furthest back. Its light is cut into eight bands and the band edges traced; every crossing of every photograph’s lines cuts a shard. Gathering, the shards travel forward and meet as the sheet, each in its named blue.</p>
       <p><b>Studio.</b> Draw into the space, upload a diagram, change the light, pick layers and blues, save an image or a GIF. <button id="studio" type="button" aria-pressed="false">Open the studio</button></p>
+      <p class="collp"><b>Collection.</b> Stills and moving images made with this interface. <button id="coll" type="button" aria-pressed="false">Open the collection</button></p>
     </div>
     <div class="folio"><span id="fo-l"></span><span></span></div>
   </div></section>
   <section class="page recto" aria-label="Recto">
     <div class="glbox" id="glbox"></div>
+    <div class="collv" id="collv" hidden aria-live="polite">
+      <div class="cm" id="cm"></div>
+      <div class="cbar"><button type="button" id="cprev" aria-label="Previous">←</button><span id="ccap"></span><button type="button" id="cnext" aria-label="Next">→</button></div>
+    </div>
     <div class="rhead"><span id="pl-r"></span><span>Thinking Blue</span></div>
     <div class="note" id="tipslot"></div>
     <p class="hint">Drag to turn · scroll to move in and out</p>
@@ -832,6 +837,24 @@ $("#dgbtn").onclick=()=>{const p=$("#dg"),v=p.hidden;p.hidden=!v;$("#dgbtn").set
 $("#file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f||!assets)return;$("#dgnote").textContent="Uploading the diagram…";
   try{const r=await assets.upload(f);const ref=db.collection("diagrams").doc();selId=ref.id;await ref.set({...DEF,word:WORD,asset:r.id,url:r.url,added:Date.now()});$("#dgnote").textContent="Placed in front of the sheet. Use the sliders to move it into the sculpture."}
   catch(err){$("#dgnote").textContent="That file could not be added. Try a PNG or JPG under 20 MB."}};
+/* the collection: stills and moving images made with the interface, cycling on the recto */
+(()=>{const BASE="https://www.rachelhorst.ca/portfolio/thinking-blue/img/";
+  const ITEMS=[{f:"gif-a.mp4",v:1},{f:"gif-b.mp4",v:1}].concat(Array.from({length:13},(_,i)=>({f:`sc-${String(i+1).padStart(2,"0")}.jpg`})));
+  const box=document.getElementById("collv"),cm=document.getElementById("cm"),cap=document.getElementById("ccap"),btn=document.getElementById("coll");let i=0,tm=null,el=null,fails=0;
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function show(k){i=(k+ITEMS.length)%ITEMS.length;clearTimeout(tm);const it=ITEMS[i],old=el;
+    el=it.v?Object.assign(document.createElement("video"),{src:BASE+it.f,muted:true,playsInline:true,autoplay:!reduce,loop:false}):Object.assign(document.createElement("img"),{src:BASE+it.f,alt:"Made with the Gathering interface"});
+    if(it.v){el.setAttribute("muted","");el.setAttribute("playsinline","");el.onended=()=>show(i+1)}
+    const go=()=>{fails=0;el.classList.add("on");if(old){old.classList.remove("on");setTimeout(()=>old.remove(),700)}};
+    if(it.v)el.addEventListener("loadeddata",go,{once:true});else el.addEventListener("load",go,{once:true});el.addEventListener("error",()=>{if(++fails<ITEMS.length)show(i+1);else cap.textContent="the collection could not be loaded"},{once:true});
+    cm.append(el);cap.textContent=`${it.v?"moving image":"still"} · ${i+1} of ${ITEMS.length}`;
+    if(!reduce)tm=setTimeout(()=>show(i+1),it.v?20000:4500)}
+  function open(on){box.hidden=!on;btn.setAttribute("aria-pressed",String(on));btn.textContent=on?"Close the collection":"Open the collection";
+    if(on)show(i);else{clearTimeout(tm);cm.replaceChildren();el=null}}
+  btn.onclick=()=>open(box.hidden);
+  document.getElementById("cprev").onclick=()=>show(i-1);document.getElementById("cnext").onclick=()=>show(i+1);
+  addEventListener("keydown",e=>{if(box.hidden)return;if(e.key==="ArrowRight")show(i+1);if(e.key==="ArrowLeft")show(i-1);if(e.key==="Escape")open(false)});
+})();
 /* on the website: the sculpture starts clear; drawings stay in the visitor's browser */
 (async()=>{if(window.claude)return;{const n=document.getElementById("dgnote");if(n)n.textContent="Lines you draw stay in your own browser. Save an image or record a GIF to keep what you made.";const u=document.getElementById("dgadd");if(u)u.hidden=true}})();
 (async()=>{if(!window.claude||!claude.use)return;
@@ -851,6 +874,16 @@ build().catch(e=>{$("#loading").textContent="THE PHOTOGRAPHS DID NOT LOAD. RELOA
 </script>
 
 <!-- full-screen book: the spread fills the window; navigation rises from the foot -->
+<style id="coll-css">
+.collv{position:absolute;inset:0;z-index:6;background:var(--paper);display:flex;flex-direction:column;padding:13cqi 7cqi 6cqi}
+.collv[hidden]{display:none}
+.collv .cm{flex:1 1 0;min-height:0;position:relative}
+.collv .cm img,.collv .cm video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .6s}
+.collv .cm .on{opacity:1}
+.collv .cbar{display:flex;justify-content:space-between;align-items:baseline;gap:1em;margin-top:2.4cqi;font:500 clamp(8px,1.45cqi,11px)/1.4 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
+.collv .cbar button{font:inherit;color:var(--ink);background:none;border:0;padding:.3em .4em;cursor:pointer}
+body.studio .collp{display:none}
+</style>
 <style id="fullbook">
 @media (max-width:760px){.stages,.stages .cl{flex-wrap:wrap!important;white-space:normal!important;overflow:visible!important}}
 @media (min-width:761px){
