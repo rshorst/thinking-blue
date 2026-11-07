@@ -216,7 +216,7 @@ body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important
     <span class="cl"><span class="lbl">width</span><button class="sm wd" data-w="0" aria-pressed="false" title="hairline">╌</button><button class="sm wd" data-w="1" aria-pressed="true" title="fine">─</button><button class="sm wd" data-w="2" aria-pressed="false" title="medium">━</button><button class="sm wd" data-w="3" aria-pressed="false" title="bold">▬</button></span>
     <span class="cl"><span class="lbl">style</span><button class="sm st" data-st="solid" aria-pressed="true" title="solid">solid</button><button class="sm st" data-st="dashed" aria-pressed="false" title="dashed">dash</button><button class="sm st" data-st="dotted" aria-pressed="false" title="dotted">dots</button></span>
     <span class="cl"><span class="lbl">arrow</span><button class="sm ar" data-ar="0" aria-pressed="true" title="no arrows">none</button><button class="sm ar" data-ar="1" aria-pressed="false" title="arrow at the end">→</button><button class="sm ar" data-ar="2" aria-pressed="false" title="arrows at both ends">↔</button></span>
-    <span class="cl"><select id="fillsel" class="sel" aria-label="Fill for drawn shapes" title="What fills the shapes you draw with the pen"><option value="-1">no fill</option></select><button id="undo2" class="sm" title="Undo your last mark">undo</button><button id="clear2" class="sm" title="Clear your marks">clear</button><button id="dgbtn" class="sm" aria-pressed="false" title="Upload a diagram to etch into the photographs or float in the space">upload</button></span>
+    <span class="cl"><select id="fillsel" class="sel" aria-label="Fill for drawn shapes" title="What fills the shapes you draw with the pen"><option value="-1">no fill</option></select><button id="undo2" class="sm" title="Undo your last mark">undo</button><button id="clear2" class="sm" title="Clear all drawings from the sculpture">clear drawings</button><button id="dgbtn" class="sm" aria-pressed="false" title="Upload a diagram to etch into the photographs or float in the space">upload</button></span>
   </span>
   <span class="cl"><button id="movebtn" class="sm" aria-pressed="false" title="Drag to slide the sculpture to another spot (or alt-drag, or middle-drag, any time)">move</button><button id="recentre" class="sm" title="Put the sculpture back in the middle">recentre</button><button id="zin" class="sm" aria-label="Move in" title="Move in (hold, or +, or scroll)">in</button><button id="zout" class="sm" aria-label="Move out" title="Move out (hold, or −, or scroll)">out</button><button id="saveimg" class="sm" hidden title="Save this view as a very large PNG">save image</button><button id="lightbtn" class="sm" aria-pressed="false" aria-controls="lightp" title="Light and blues">light ▾</button><button id="gifbtn" class="sm" aria-pressed="false" aria-controls="gifp" title="Record the sculpture as a looping GIF">save gif</button><button id="focusbtn" class="sm" title="Hide all text and controls (F)">focus</button></span>
 </div>
@@ -761,12 +761,13 @@ function addFill(line,pts,fill){if(pts.length<9)return;const P=[];for(let i=0;i+
 /* a visitor's own marks live only in their browser */
 const LKEY="blue-sculpture-lines:"+WORD;
 function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify(marks.filter(m=>m.local).map(m=>m.d)))}catch(e){}}
-function loadLocal(){try{JSON.parse(localStorage.getItem(LKEY)||"[]").forEach((d,i)=>{if(d&&(Array.isArray(d.pts)||d.kind==="link"))marks.push({id:"local-"+i,d,local:true})})}catch(e){}renderMarks()}
+function loadLocal(){if(!window.claude){renderMarks();return}try{JSON.parse(localStorage.getItem(LKEY)||"[]").forEach((d,i)=>{if(d&&(Array.isArray(d.pts)||d.kind==="link"))marks.push({id:"local-"+i,d,local:true})})}catch(e){}renderMarks()}
 function strokeNote(){const el=$("#strokes");if(!el)return;el.hidden=false;const n=marks.length;el.querySelector("span").textContent=n?`${n} mark${n>1?"s":""} in the space`:"No marks yet"}
 function mine(){return marks.filter(m=>m.local||(canEdit&&!m.local))}
 async function undoMark(){const own=mine().sort((x,y)=>(x.d.added||0)-(y.d.added||0)),m=own[own.length-1];if(!m)return;
   if(m.d.kind==="node")for(const l of marks.filter(x=>x.d.kind==="link"&&(x.d.a===m.d.nid||x.d.b===m.d.nid)))await removeMark(l);await removeMark(m)}
 async function clearMarks(b){if(!b.dataset.sure){b.dataset.sure=1;const t=b.textContent;b.textContent="clear all?";setTimeout(()=>{delete b.dataset.sure;b.textContent=t},4000);return}
+  if(!window.claude){marks=[];renderMarks();strokeNote();delete b.dataset.sure;return}
   for(const m of [...mine()])await removeMark(m);delete b.dataset.sure}
 $("#undo").onclick=undoMark;$("#undo2").onclick=undoMark;$("#clear").onclick=e=>clearMarks(e.target);$("#clear2").onclick=e=>clearMarks(e.target);
 /* the two menus */
@@ -820,8 +821,8 @@ $("#dgbtn").onclick=()=>{const p=$("#dg"),v=p.hidden;p.hidden=!v;$("#dgbtn").set
 $("#file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f||!assets)return;$("#dgnote").textContent="Uploading the diagram…";
   try{const r=await assets.upload(f);const ref=db.collection("diagrams").doc();selId=ref.id;await ref.set({...DEF,word:WORD,asset:r.id,url:r.url,added:Date.now()});$("#dgnote").textContent="Placed in front of the sheet. Use the sliders to move it into the sculpture."}
   catch(err){$("#dgnote").textContent="That file could not be added. Try a PNG or JPG under 20 MB."}};
-/* on the website: Roy's saved marks, read-only, from marks.json */
-(async()=>{if(window.claude)return;{const n=document.getElementById("dgnote");if(n)n.textContent="Lines you draw stay in your own browser. Save an image or record a GIF to keep what you made.";const u=document.getElementById("dgadd");if(u)u.hidden=true}try{const all=await(await fetch("marks.json")).json();all.forEach(m=>{if((m.d.word||"blue-sky")===WORD&&!marks.find(x=>x.id===m.id))marks.push({id:m.id,d:m.d})});renderMarks()}catch(e){}})();
+/* on the website: the sculpture starts clear; drawings stay in the visitor's browser */
+(async()=>{if(window.claude)return;{const n=document.getElementById("dgnote");if(n)n.textContent="Lines you draw stay in your own browser. Save an image or record a GIF to keep what you made.";const u=document.getElementById("dgadd");if(u)u.hidden=true}})();
 (async()=>{if(!window.claude||!claude.use)return;
   const [d_,a_,u_,dl_]=await Promise.all([claude.use("db"),claude.use("assets"),claude.use("user"),claude.use("downloads")]);db=d_;assets=a_;canEdit=!!(u_&&u_.canEdit&&u_.canEdit())&&!!assets;
   dls=dl_;$("#saveimg").hidden=!dls;$("#dgnote").textContent=canEdit?$("#dgnote").textContent:"Lines you draw stay in your own browser. Save image keeps a copy of what you made.";
