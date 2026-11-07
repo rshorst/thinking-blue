@@ -838,3 +838,37 @@ $("#file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f|
 build().catch(e=>{$("#loading").textContent="THE PHOTOGRAPHS DID NOT LOAD. RELOAD TO TRY AGAIN.";console.error(e)});
 </script>
 
+<!-- full-screen book: the spread fills the window; navigation rises from the foot -->
+<style id="fullbook">
+@media (min-width:761px){
+  html,body{height:100%}
+  body{padding:0!important;margin:0!important;gap:0!important;min-height:100svh!important;justify-content:center!important;overflow:hidden!important}
+  .spread{width:min(100vw,calc(100svh * 1.5))!important;max-width:none!important;box-shadow:none!important}
+  .turn{position:fixed!important;left:0;right:0;bottom:0;width:auto!important;max-width:none!important;z-index:1000;margin:0!important;padding:14px max(16px,4vw) 18px;
+    background:color-mix(in srgb,var(--table) 94%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    box-shadow:0 -12px 32px -22px rgba(0,0,0,.6);transform:translateY(102%);transition:transform .35s ease}
+  .turn.show,.turn:focus-within{transform:none}
+  .peek{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:999;font:500 10px/1 var(--mono,"IBM Plex Mono",monospace);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--table-ink);background:color-mix(in srgb,var(--table) 80%,transparent);border:0;border-radius:6px 6px 0 0;padding:7px 14px 8px;cursor:pointer;opacity:.7;transition:opacity .3s}
+  .peek:hover{opacity:1}
+  body.navshow .peek{opacity:0;pointer-events:none}
+}
+@media (max-width:760px){.peek{display:none}}
+.head a.home{color:inherit;text-decoration:none;pointer-events:auto}
+.head a.home:hover{text-decoration:underline;text-underline-offset:.25em}
+</style>
+<button class="peek" type="button" aria-label="Show navigation">contents ▴</button>
+<script>
+(()=>{const t=document.querySelector(".turn"),pk=document.querySelector(".peek");if(!t)return;let tm;
+  const show=()=>{clearTimeout(tm);t.classList.add("show");document.body.classList.add("navshow")};
+  const hide=()=>{t.classList.remove("show");document.body.classList.remove("navshow")};
+  const later=ms=>{clearTimeout(tm);tm=setTimeout(()=>{if(!t.matches(":hover")&&!t.contains(document.activeElement))hide()},ms)};
+  addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;if(innerHeight-e.clientY<64)show();else if(t.classList.contains("show")&&!t.contains(e.target))later(500)});
+  addEventListener("wheel",e=>{if(e.target.closest&&e.target.closest("canvas,.mat,.text,#stepslot"))return;if(e.deltaY>8){show();later(2600)}else if(e.deltaY<-8)hide()},{passive:true});
+  pk.onclick=()=>{t.classList.contains("show")?hide():(show(),later(4000))};
+  addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
+  show();later(2200);
+  /* the running head "Thinking Blue" goes back to the cover */
+  if(!document.querySelector(".books"))document.querySelectorAll(".head span").forEach(s=>{if(s.textContent.trim()==="Thinking Blue"){const a=document.createElement("a");a.href="../";a.className="home";a.textContent="Thinking Blue";s.replaceChildren(a)}});
+})();
+</script>
