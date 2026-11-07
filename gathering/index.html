@@ -179,11 +179,10 @@ body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important
     <h1 class="vword" id="h1"></h1>
     <div id="capslot"></div>
     <div id="stepslot"></div>
+    <div class="more" role="group" aria-label="More"><button id="studio" type="button" aria-pressed="false" title="Draw into the space, change the light, pick layers and blues, save an image or a GIF">Studio</button><button id="coll" type="button" aria-pressed="false" title="Stills and moving images made with this interface">Collection</button></div>
     <div class="colo">
       <p id="counts"></p>
       <p><b>Gathering.</b> Each photograph sits on its own plane, the first furthest back. Its light is cut into eight bands and the band edges traced; every crossing of every photograph’s lines cuts a shard. Gathering, the shards travel forward and meet as the sheet, each in its named blue.</p>
-      <p><b>Studio.</b> Draw into the space, upload a diagram, change the light, pick layers and blues, save an image or a GIF. <button id="studio" type="button" aria-pressed="false">Open the studio</button></p>
-      <p class="collp"><b>Collection.</b> Stills and moving images made with this interface. <button id="coll" type="button" aria-pressed="false">Open the collection</button></p>
     </div>
     <div class="folio"><span id="fo-l"></span><span></span></div>
   </div></section>
@@ -282,7 +281,7 @@ body:not(.studio) .stages button[aria-pressed="true"]{color:var(--ink)!important
 (()=>{const m=(id,to)=>document.getElementById(to).append(document.getElementById(id));
   m("gl","glbox");m("loading","glbox");m("cap","capslot");const st=document.querySelector(".stages");document.getElementById("stepslot").append(st);m("tip","tipslot");
   const b=document.getElementById("studio");b.onclick=()=>{const on=!document.body.classList.contains("studio");document.body.classList.toggle("studio",on);b.setAttribute("aria-pressed",on);
-    b.textContent=on?"Close the studio":"Open the studio";dispatchEvent(new Event("resize"))}})();
+    dispatchEvent(new Event("resize"))}})();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -849,7 +848,7 @@ $("#file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f|
     if(it.v)el.addEventListener("loadeddata",go,{once:true});else el.addEventListener("load",go,{once:true});el.addEventListener("error",()=>{if(++fails<ITEMS.length)show(i+1);else cap.textContent="the collection could not be loaded"},{once:true});
     cm.append(el);cap.textContent=`${it.v?"moving image":"still"} · ${i+1} of ${ITEMS.length}`;
     if(!reduce)tm=setTimeout(()=>show(i+1),it.v?20000:4500)}
-  function open(on){box.hidden=!on;btn.setAttribute("aria-pressed",String(on));btn.textContent=on?"Close the collection":"Open the collection";
+  function open(on){box.hidden=!on;btn.setAttribute("aria-pressed",String(on));
     if(on)show(i);else{clearTimeout(tm);cm.replaceChildren();el=null}}
   btn.onclick=()=>open(box.hidden);
   document.getElementById("cprev").onclick=()=>show(i-1);document.getElementById("cnext").onclick=()=>show(i+1);
@@ -875,14 +874,19 @@ build().catch(e=>{$("#loading").textContent="THE PHOTOGRAPHS DID NOT LOAD. RELOA
 
 <!-- full-screen book: the spread fills the window; navigation rises from the foot -->
 <style id="coll-css">
-.collv{position:absolute;inset:0;z-index:6;background:var(--paper);display:flex;flex-direction:column;padding:13cqi 7cqi 6cqi}
+.more{display:flex;gap:0;margin-top:2.6cqi}
+.more button{font:500 clamp(8px,1.45cqi,11px)/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--pink2,#7f8ba3);background:none;border:0;border-bottom:1px solid transparent;border-radius:0;padding:0 0 .35em;margin:0 1.4em 0 0;cursor:pointer}
+.more button:hover{color:var(--pink,#e4e9f2)}
+.more button[aria-pressed="true"]{color:var(--pink,#e4e9f2);border-bottom-color:currentColor}
+body.studio .more{margin-top:1.4cqi}
+.collv{position:absolute;inset:0;z-index:6;background:var(--paper);display:flex;flex-direction:column;padding:12cqi 7cqi 12cqi}
 .collv[hidden]{display:none}
 .collv .cm{flex:1 1 0;min-height:0;position:relative}
 .collv .cm img,.collv .cm video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .6s}
 .collv .cm .on{opacity:1}
-.collv .cbar{display:flex;justify-content:space-between;align-items:baseline;gap:1em;margin-top:2.4cqi;font:500 clamp(8px,1.45cqi,11px)/1.4 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
+.collv .cbar{order:-1;display:flex;justify-content:space-between;align-items:baseline;gap:1em;margin:0 0 2.4cqi;font:500 clamp(8px,1.45cqi,11px)/1.4 var(--mono);letter-spacing:.12em;color:var(--ink-2)}
 .collv .cbar button{font:inherit;color:var(--ink);background:none;border:0;padding:.3em .4em;cursor:pointer}
-body.studio .collp{display:none}
+
 </style>
 <style id="fullbook">
 @media (max-width:760px){.stages,.stages .cl{flex-wrap:wrap!important;white-space:normal!important;overflow:visible!important}}
